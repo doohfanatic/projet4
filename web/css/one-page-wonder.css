@@ -1,0 +1,269 @@
+/*!
+ * Start Bootstrap - One Page Wonder (http://startbootstrap.com/template-overviews/one-page-wonder)
+ * Copyright 2013-2017 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-one-page-wonder/blob/master/LICENSE)
+ */
+
+body {
+    padding-top: 54px;
+}
+
+@media (min-width: 992px) {
+    body {
+        padding-top: 56px;
+    }
+}
+
+/**
+FONT **/
+@font-face {
+    font-family: 'Pacifico';
+    src: url('../fonts/Pacifico.ttf.woff') format('woff'),
+    url('../fonts/Pacifico.ttf.svg#Pacifico') format('svg'),
+    url('../fonts/Pacifico.ttf.eot'),
+    url('../fonts/Pacifico.ttf.eot?#iefix') format('embedded-opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Museo-700';
+    src: url('../fonts/Museo-700.ttf.woff') format('woff'),
+    url('../fonts/Museo-700.ttf.svg#Museo-700') format('svg'),
+    url('../fonts/Museo-700.ttf.eot'),
+    url('../fonts/Pacifico.ttf.eot?#iefix') format('embedded-opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+.col-center-block {
+    float: none;
+    display: block;
+    margin: 0 auto;
+    /* margin-left: auto; margin-right: auto; */
+}
+label{
+    font-family: 'Museo-700';
+}
+header.masthead {
+    background: url('../images/slide.jpg') no-repeat center center scroll;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    font-family: 'Museo-700';
+    -o-background-size: cover;
+}
+
+.navbar-brand {
+    font-family: 'Pacifico';
+}
+
+/*
+div.overlay {
+    background: url('../images/slide.jpg') no-repeat center center scroll;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    font-family: 'Voltaire', sans-serif;
+    -o-background-size: cover;
+}*/
+
+header.masthead > .overlay {
+    padding: 5rem 0;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+@media (min-width: 992px) {
+    header.masthead > .overlay {
+        padding: 10rem 0;
+    }
+}
+
+/*--  FIL D'ARIANE --*/
+#breadcrumbs {
+    background: #fff;
+    padding-left: 0;
+    list-style: none;
+}
+
+#breadcrumbs li {
+    float: left;
+}
+
+#breadcrumbs a {
+    background-color: #ffffff !important;
+    border: 1px solid #343a40;
+    color: #343a40;
+    float: left;
+    padding: 0.7em 1em 0.7em 2em;
+    position: relative;
+    text-decoration: none;
+}
+
+#breadcrumbs li:first-child a {
+    padding-left: 1em;
+}
+
+/**
+* ------------- /////////////////------ ETAPE UN -------- ///////////////////
+**/
+#breadcrumbs li.etape1 {
+    background-color: #424242 !important;
+    padding-left: 1em;
+    border: 1px solid #424242 !important;
+    color: #fff;
+    font-family: 'Museo-700', cursive;
+    float: left;
+    padding: 0.7em 1em 0.7em 2em;
+    position: relative;
+    text-decoration: none;
+    font-size: larger;
+}
+
+#breadcrumbs li.etape1::after {
+    border-left-color: #424242 !important;
+    z-index: 2;
+}
+
+#breadcrumbs li.etape1::after,
+#breadcrumbs li.etape1::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    margin-top: -1.5em;
+    border-top: 1.5em solid transparent;
+    border-bottom: 1.5em solid transparent;
+    border-left: 1em solid;
+    right: -1em;
+}
+
+/**
+* ------------- /////////////////------ ETAPE DEUX  -------- ///////////////////
+**/
+#breadcrumbs li.etape2 {
+    background-color: #616161;
+    padding-left: 1em;
+    border: 1px solid #616161 !important;
+    color: #fff;
+    font-family: 'Museo-700', cursive;
+    float: left;
+    padding: 0.7em 1em 0.7em 2em;
+    position: relative;
+    text-decoration: none;
+    font-size: larger;
+}
+
+#breadcrumbs li.etape2::after {
+    border-left-color: #616161 !important;
+    z-index: 2;
+}
+
+#breadcrumbs li.etape2::after,
+#breadcrumbs li.etape2::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    margin-top: -1.5em;
+    border-top: 1.5em solid transparent;
+    border-bottom: 1.5em solid transparent;
+    border-left: 1em solid;
+    right: -1em;
+}
+
+/**
+* ------------- /////////////////------ ETAPE Trois  -------- ///////////////////
+**/
+#breadcrumbs li.etape3 {
+    background-color: #757575;
+    padding-left: 1em;
+    border: 1px solid #757575 !important;
+    color: #fff;
+    font-family: 'Museo-700';
+    float: left;
+    padding: 0.7em 1em 0.7em 2em;
+    position: relative;
+    text-decoration: none;
+    font-size: larger;
+}
+
+#breadcrumbs li.etape3::after {
+    border-left-color: #757575 !important;
+    z-index: 2;
+}
+
+.card-title {
+    font-family: 'Museo-700', cursive;
+}
+
+#breadcrumbs li.etape3::after,
+#breadcrumbs li.etape3::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    margin-top: -1.5em;
+    border-top: 1.5em solid transparent;
+    border-bottom: 1.5em solid transparent;
+    border-left: 1em solid;
+    right: -1em;
+}
+
+#breadcrumbs a:hover {
+    background: #fff;
+    color: #343a40;
+}
+
+#breadcrumbs a::after,
+#breadcrumbs a::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    margin-top: -1.5em;
+    border-top: 1.5em solid transparent;
+    border-bottom: 1.5em solid transparent;
+    border-left: 1em solid;
+    right: -1em;
+}
+
+#breadcrumbs a::after {
+    border-left-color: #343a40;
+    z-index: 2;
+}
+
+#breadcrumbs a::before {
+    border-left-color: #343a40;
+    right: -1.1em;
+    z-index: 1;
+}
+
+#breadcrumbs a:hover::after {
+    border-left-color: #fff;
+}
+
+#breadcrumbs .current,
+#breadcrumbs .current:hover {
+    font-weight: bold;
+    background: none;
+}
+
+#breadcrumbs .current::after,
+#breadcrumbs .current::before {
+    content: normal;
+}
+.Mycircle {
+    border: 2px solid #ffffff;
+    padding: 10px 17px;
+    width: 300px;
+    border-radius: 50%;
+}
+
+.error-field {
+    margin-top: -19px;
+    color: #ff0000;
+    float: right;
+    font-size: 15px;
+}
+#delai{
+    font-family: 'Museo-700';
+    text-align: center;
+
+}

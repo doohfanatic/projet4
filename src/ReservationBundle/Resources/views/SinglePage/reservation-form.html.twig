@@ -1,0 +1,108 @@
+<div id="reservation_info">
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label>Sélectionner une date</label>
+            <div id="date_visite" data-date="12/03/2012"></div>
+            <input type="hidden" id="my_hidden_input" name="date_reservation" required>
+            <input type="hidden" id="date_reservation_formated" name="date_reservation_formated" required>
+
+            <div class="alert alert-danger" id="error_date_reservation" style="display: none;"> Date non distponible
+                veuillez séléctionnez un autre date
+            </div>
+
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <label for="nb_billet" class="col-form-label">Type de billet </label>
+                <select name="type_billet" class="form-control">
+                    <option value="journee">Journée</option>
+                    <option value="demi-journee">Demi-journée</option>
+                </select>
+
+            </div>
+            <div class="form-group col-md-12">
+                <label for="nb_billet" class="col-form-label">Choisissez le nombre de billets</label>
+                <input type="number" class="form-control" id="nb_billet" name="nb_billet" required>
+                <br>
+                <em class="error-field" id="validation">Veuillez entrez le nombre de billet</em>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <center>
+                <div class="button-wrapper" style="margin-left: 52%">
+                    <button id="etapeSuivant" class="a-btn">
+                        <span class="a-btn-text">Passez à l'étape suivante</span>
+                        <span class="a-btn-slide-text">Renseignement sur le(s) billet(s)</span>
+                    </button>
+                </div>
+            </center>
+        </div>
+    </div>
+</div>
+
+
+{% block javascripts %}
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('date-picker/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('date-picker/locales/bootstrap-datepicker.fr.min.js') }}"></script>
+    <script type="text/javascript">
+        var now = new Date();
+        var disabled_dates = ["1-5", "1-11", "25-12"];
+
+        $('#date_visite').datepicker({
+            autoclose: true,
+            startDate: "today",
+            endDate: "+120d",
+            daysOfWeekDisabled: "2",
+            format: "dd-mm-yyyy",
+            todayHighlight: true,
+            language: 'fr',
+            orientation: "bottom",
+            beforeShowDay: function (date) {
+                var dt_ddmm = date.getDate() + '-' + (date.getMonth() + 1);
+                return (disabled_dates.indexOf(dt_ddmm) == -1);
+            }
+        }).on('changeDate', function (e) {
+            var fullDate = dateFr(e.date);
+            var selectedDate = new Date(e.date);
+            var sectedDateFormated = getFormattedDate(selectedDate);
+            $('#date_reservation_formated').val(sectedDateFormated);
+            $('#my_hidden_input').val(fullDate);
+        });
+
+        $('#my_hidden_input').val(dateFr(now));
+        $('#date_reservation_formated').val(getFormattedDate(now));
+        $("#nb_billet").keyup(function () {
+            $('#validation').hide();
+            $('#etapeSuivant').attr("disabled", false);
+        });
+
+        function getFormattedDate(date) {
+            var year = date.getFullYear();
+
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+
+            return year + '-' + month + '-' + day;
+        }
+        //function pour faire la date en français
+        function dateFr(date) {
+
+            var mois = new Array("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "decembre");
+            // on recupere la date
+            var date = new Date(date);
+            // on construit le message
+            var message = date.getDate() + " ";   // numero du jour
+            message += mois[date.getMonth()] + " ";   // mois
+            message += date.getFullYear();
+            return message;
+        }
+    </script>
+{% endblock %}

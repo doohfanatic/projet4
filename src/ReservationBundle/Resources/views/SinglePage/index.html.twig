@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+
+    <div id="content" style="display:none">
+
+        <div class="container" style="background:#f5f5f5">
+            <div class="row" style="margin-top:30px; margin-bottom:30px;">
+                <ul id="breadcrumbs">
+                    <li class="etape1 temp1" id="#etape_reservation"><center><span class="Mycircle">1</span> Détails de la réservation</center></li>
+                    <li class="etape2 temp2" id="#etape_billet"> <center><span class="Mycircle">2</span> Renseignements sur le(s) billet(s)</center></li>
+                    <li class="etape3 temp3" id="#etape_paiement" style="width: 369px !important;"> <center><span class="Mycircle">3</span> Paiement</center></li>
+                </ul>
+            </div>
+            <div id="loading_bar" style="display: none; margin: 294px 895px; position: absolute; z-index: 500;">
+                <img class="img-circle img-responsive" width="20px"
+                     src="{{ asset('images/loading_pr2.gif') }}">
+
+            </div>
+            <form action="{{ path('get_info') }}" method="POST" id="payment-form">
+                <div class="payment-errors"></div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        {% include('ReservationBundle:SinglePage:reservation-form.html.twig') %}
+                        <div class="row">
+                            {% include('ReservationBundle:SinglePage:billet-form.html.twig') %}
+                        </div>
+                        {% include('ReservationBundle:SinglePage:stripe-form.html.twig') %}
+                    </div>
+                </div>
+
+                <div id="validate_all" class="button-wrapper" style="margin-left: 52%; display: none;">
+                    <button class="a-btn" style="margin-left: -9px;">
+                        <span class="a-btn-text">Validez votre reservation</span>
+                        <span class="a-btn-slide-text">Votre billet sera envoyé par mail</span>
+                        <span id="loading_pay" style="display: none; margin: -34px 276px; position: absolute; z-index: 150;">
+                            <img class="img-circle img-responsive" width="20px" src="{{ asset('images/loading_pr2.gif') }}">
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('jquery-ui-1.12.1/jquery-ui.js') }}"></script>
+    <script src="{{ asset('date-picker/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('js/popper.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+
+    <script type="text/javascript">
+        $(document).on("click", "#acheterBtn", function () {
+            $("#header_nav").fadeIn(1000).css("display", "none");
+            $('#content').fadeIn(1000).css("display", "block");
+        });
+        /*$('#goHome').click(function (e) {
+            e.preventDefault();
+            $("#header_nav").fadeIn(1000).css("display", "block");
+            $('#content').fadeIn(1000).css("display", "none");
+        });*/
+
+        $('#loadingBtn').click(function (e) {
+            $("#loading_bar").fadeIn(1000).css("display", "block");
+        });
+        $('#loadingcacher').click(function (e) {
+            $("#loading_bar").fadeIn(1000).css("display", "none");
+        });
+
+    </script>
+{% endblock %}

@@ -1,0 +1,7 @@
+reservation_user:
+    resource: "@ReservationBundle/Resources/config/routing/user.yml"
+    prefix:   /
+
+reservation_place:
+    resource: "@ReservationBundle/Resources/config/routing/reservation.yml"
+    prefix:   /

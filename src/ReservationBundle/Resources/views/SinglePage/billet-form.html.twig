@@ -1,0 +1,525 @@
+<div style="display:none" id="billet" class="col-md-8">
+</div>
+<div class="col-md-4" style="display: none" id="tarrifs_details">
+    <div class="card" style="width: 20rem;">
+        <img class="card-img-top" src="{{ asset('images/slide.jpg') }}" alt="Card image cap">
+
+        <div class="card-body">
+            <h4 class="card-title">Musée du Louvre</h4>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Date de la visite : <span style="font-weight: bold"
+                                                                  id="date_reservation"></span></li>
+            <li class="list-group-item">
+                <center>Tarif</center>
+                <div style="display: none;" id="tarif">
+                    <div style="font-weight: bold;" class="row">
+                        <div class="col-sm-4">N° Billet</div>
+                        <div class="col-sm-4">Tarif</div>
+                        <div class="col-sm-4">Montant</div>
+                    </div>
+                    <div class="row" id="tarif_content"></div>
+                </div>
+            </li>
+        </ul>
+        <div class="card-body">
+            Prix Total :<span style="margin-left: 134px;" id="montant_total"></span>
+            <input type="hidden" id="montant_total" name="montant_total">
+        </div>
+        <div class="card-footer text-muted">
+            <center>
+                <button type="button" class="btn btn-primary" id="strippay">
+                    Allez vers le paiement
+                </button>
+            </center>
+        </div>
+
+    </div>
+</div>
+
+{% block javascripts %}
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('date-picker/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('date-picker/locales/bootstrap-datepicker.fr.min.js') }}"></script>
+
+
+    {#<script src="{{ asset('jquery-ui-1.12.1/jquery-ui.js') }}"></script>#}
+
+
+    <script type="text/javascript">
+
+        $('#validation').hide();
+        $('#etapeSuivant').click(function (e) {
+            e.preventDefault();
+
+            $('#etapeSuivant').attr("disabled", true);
+
+            var nombre_billet = $('#nb_billet').val();
+            if (nombre_billet != undefined && nombre_billet != '') {
+                $('#etape_reservation').removeAttr('class').attr('class', '');
+
+                $("#loading_bar").fadeIn(1000).css("display", "block");
+                var sectedDateFormated = $('#date_reservation_formated').val();
+                $.ajax({
+                    type: "GET",
+                    url: 'verif-date-reservation',
+                    data: {date: sectedDateFormated},
+                    success: function (data) {
+                        if (data.content.message != "disponible") {
+                            $('#error_date_reservation').css('display', 'block');
+                            $('#etapeSuivant').attr("disabled", true);
+                        } else {
+                            $('#error_date_reservation').css('display', 'none');
+                            $('#etapeSuivant').attr("disabled", false);
+
+                            localStorage.setItem('_nbr', nombre_billet);
+                            $('#reservation_info').fadeIn(1000).css("display", "none");
+                            $("#billet").fadeOut(1000).css("display", "block");
+                            $("#tarrifs_details").fadeOut(1000).css("display", "block");
+
+                            for (var i = 1; i <= nombre_billet; i++) {
+                                $('#billet').append('<span class="text-center" > Billet ' + i + '</span>' +
+                                    '<div style="border: solid 1px; padding: 10px ;">' +
+                                    '<div class="row form-group">' +
+                                    '<input type="hidden" value="0" id="montant' + i + '" name="montant' + i + '"><input type="hidden" id="motif' + i + '" name="motif' + i + '">' +
+                                    createTag(i, "nom", "Nom", "validate form-control") + createTag(i, "prenom", "Prenom", "validate form-control") +
+                                    '</div>' +
+                                    '<div class="row">' +
+                                    '<div class="col-sm-6">' +
+                                    '<p style="display: none; font-size: 14px; margin-left: 5px;" id="reduit' + i + '">il sera nécessaire de présenter votre carte d’étudiant, militaire ou équivalent lors de l’entrée</p>' +
+                                    '<p id="nonreduit' + i + '"><input type="text" class="datepickerbirth form-control" name="datenaissance' + i + '" id="' + i + '" placeholder="Date de naissance" autocomplete="off" readonly></p>' +
+                                    '</div>' +
+                                    createTag(i, "pays", "Pays", "validate recherche form-control") +
+                                    '</div>' +
+                                    '<div class="row">' +
+                                    '<div class="col-sm-12"><input type="checkbox" name="tarif_reduit' + i + '" id="' + i + '"> <span style="margin-left: 10px;">Je bénéficie d\'un tarif réduit</span></div>' +
+                                    '</div>' +
+                                    '</div>');
+
+                                $('#tarif #tarif_content').append(
+                                    '<div style="display: none;" class="numbillet' + i + ' col-sm-4"></div>' +
+                                    '<div style="display: none;" class="tarif' + i + ' col-sm-4"></div>' +
+                                    '<div style="display: none;" class="montant' + i + ' col-sm-4"></div>'
+                                )
+                            }
+                        }
+                    }
+                }).done(function () {
+                    $("#loading_bar").fadeOut(2000).css("display", "none");
+                });
+            } else {
+                $('#validation').show();
+            }
+            $('#date_reservation').html($('#my_hidden_input').val());
+        });
+        function createTag(index, name, placeholder, my_class) {
+            var html = '';
+            html += '<div class="col-sm-6"><input type="text" class="' + my_class + '" name="' + name + index + '" id="' + index + '" placeholder="' + placeholder + '" required> <br><em class="error-field obligatoire' + name + index + '" style="display:none">Ce champs est obligatoire</em></div>';
+            return html;
+        }
+
+        function getTotal(nb) {
+            var total = 0;
+            for (var i = 1; i <= nb; i++) {
+                total += parseInt($('#montant' + i).val());
+            }
+            return total;
+        }
+
+        function dateDiff(dob, id) {
+            if (dob == 'reduit') {
+                var montant = 10;
+                var tarif = 'reduit';
+                //append tarif value
+                $('#montant' + id).val(montant);
+                $('#motif' + id).val(tarif);
+                $('#tarif').css('display', 'block');
+                $('.numbillet' + id).css('display', 'block').html('billet n° ' + id);
+                $('.tarif' + id).css('display', 'block').html(tarif);
+                $('.montant' + id).css('display', 'block').html(montant + '<span style="float: right;">€');
+            } else {
+                //calcul age
+                var today = new Date();
+                var dayDiff = Math.ceil(today - dob) / (1000 * 60 * 60 * 24 * 365);
+                var age = parseInt(dayDiff);
+                //get tarif
+                if (age <= 12) var montant = 8;
+                else if (age > 12 && age < 60) var montant = 16;
+                else var montant = 12;
+                $('#montant' + id).val(montant);
+                //get motif
+                if (age <= 12) var tarif = 'enfant';
+                else if (age > 12 && age < 60) var tarif = 'normal';
+                else var tarif = 'senior';
+                $('#motif' + id).val(tarif);
+                //append tarif value
+                $('#tarif').css('display', 'block');
+                $('.numbillet' + id).css('display', 'block').html('billet n° ' + id);
+                $('.tarif' + id).css('display', 'block').html(tarif);
+                $('.montant' + id).css('display', 'block').html(montant + '<span style="float: right;">€');
+            }
+        }
+
+        $('#btnPaiement').click(function () {
+            $('#billet').fadeIn(1000).css("display", "none");
+            $("#paiement_info").fadeOut(1000).css("display", "block");
+            $("#valider").fadeOut(1000).css("display", "block");
+        });
+
+        $(document).on('mousedown', "#billet", function (e) {
+            var $name = e.target.name;
+
+            var id_selector = e.target.id;
+            $(".validate").keyup(function () {
+                $(".error-field").css("display", "none");
+            });
+            //$('#' + id_selector).attr('focus', 'geolocate');
+            $('input[name="datenaissance' + id_selector + '"]').datepicker({
+                autoclose: true,
+                startDate: "-100y",
+                endDate: "-4y",
+                format: "dd-mm-yyyy",
+                language: 'fr',
+                orientation: "bottom"
+            });
+            $('input[name="datenaissance' + id_selector + '"]').on('changeDate', function (data) {
+                var fullDate = data.date;
+                dateDiff(fullDate, id_selector);
+                $('#montant_total').html(getTotal(localStorage.getItem('_nbr')) + '<span style="float: right;">€');
+                $('input[name="montant_total"]').val(getTotal(localStorage.getItem('_nbr')));
+            });
+
+            $('input[name="tarif_reduit' + id_selector + '"]').on('click', function (e) {
+                var defaultDate = $('input[name="datenaissance' + id_selector + '"]').val();
+                var mydate = new Date(defaultDate);
+                if (e.target.checked == true) {
+                    dateDiff('reduit', id_selector);
+                    $('#montant_total').html(getTotal(localStorage.getItem('_nbr')) + '<span style="float: right;">€');
+                    $('input[name="montant_total"]').val(getTotal(localStorage.getItem('_nbr')));
+                    $('p#nonreduit' + id_selector).css('display', 'none');
+                    $('p#reduit' + id_selector).css('display', 'block');
+                } else {
+                    if (defaultDate != '') {
+                        dateDiff(mydate, id_selector);
+                    }else{
+                        $('#montant' + id_selector).val('0');
+                        $('.montant' + id_selector).css('display', 'none');
+                        $('.numbillet' + id_selector).css('display', 'none');
+                        $('.tarif' + id_selector).css('display', 'none');
+                    }
+                    $('#montant_total').html(getTotal(localStorage.getItem('_nbr')) + '<span style="float: right;">€');
+                    $('input[name="montant_total"]').val(getTotal(localStorage.getItem('_nbr')));
+                    $('p#reduit' + id_selector).css('display', 'none');
+                    $('p#nonreduit' + id_selector).css('display', 'block');
+                }
+            });
+
+            $('input[name="pays' + id_selector + '"]').on('click', function () {
+                var availableTags = [
+                    "Afghanistan",
+                    "Afrique du Sud",
+                    "Albanie",
+                    "Algérie",
+                    "Allemagne",
+                    "Andorre",
+                    "Angola",
+                    "Anguilla",
+                    "Antarctique",
+                    "Antigua-et-Barbuda",
+                    "Antilles néerlandaises",
+                    "Arabie saoudite",
+                    "Argentine",
+                    "Arménie",
+                    "Aruba",
+                    "Australie",
+                    "Autriche",
+                    "Azerbaïdjan",
+                    "Bahamas",
+                    "Bahreïn",
+                    "Bangladesh",
+                    "Barbade",
+                    "Bélarus",
+                    "Belgique",
+                    "Belize",
+                    "Bénin",
+                    "Bermudes",
+                    "Bhoutan",
+                    "Bolivie",
+                    "Bosnie-Herzégovine",
+                    "Botswana",
+                    "Brésil",
+                    "Brunéi Darussalam",
+                    "Bulgarie",
+                    "Burkina Faso",
+                    "Burundi",
+                    "Cambodge",
+                    "Cameroun",
+                    "Canada",
+                    "Cap-Vert",
+                    "Ceuta et Melilla",
+                    "Chili",
+                    "Chine",
+                    "Chypre",
+                    "Colombie",
+                    "Comores",
+                    "Congo-Brazzaville",
+                    "Corée du Nord",
+                    "Corée du Sud",
+                    "Costa Rica",
+                    "Côte d’Ivoire",
+                    "Croatie",
+                    "Cuba",
+                    "Danemark",
+                    "Diego Garcia",
+                    "Djibouti",
+                    "Dominique",
+                    "Égypte",
+                    "El Salvador",
+                    "Émirats arabes unis",
+                    "Équateur",
+                    "Érythrée",
+                    "Espagne",
+                    "Estonie",
+                    "État de la Cité du Vatican",
+                    "États fédérés de Micronésie",
+                    "États-Unis",
+                    "Éthiopie",
+                    "Fidji",
+                    "Finlande",
+                    "France",
+                    "Gabon",
+                    "Gambie",
+                    "Géorgie",
+                    "Géorgie du Sud et les îles Sandwich du Sud",
+                    "Ghana",
+                    "Gibraltar",
+                    "Grèce",
+                    "Grenade",
+                    "Groenland",
+                    "Guadeloupe",
+                    "Guam",
+                    "Guatemala",
+                    "Guernesey",
+                    "Guinée",
+                    "Guinée équatoriale",
+                    "Guinée-Bissau",
+                    "Guyana",
+                    "Guyane française",
+                    "Haïti",
+                    "Honduras",
+                    "Hongrie",
+                    "Île Bouvet",
+                    "Île Christmas",
+                    "Île Clipperton",
+                    "Île de l'Ascension",
+                    "Île de Man",
+                    "Île Norfolk",
+                    "Îles Åland",
+                    "Îles Caïmans",
+                    "Îles Canaries",
+                    "Îles Cocos - Keeling",
+                    "Îles Cook",
+                    "Îles Féroé",
+                    "Îles Heard et MacDonald",
+                    "Îles Malouines",
+                    "Îles Mariannes du Nord",
+                    "Îles Marshall",
+                    "Îles Mineures Éloignées des États-Unis",
+                    "Îles Salomon",
+                    "Îles Turks et Caïques",
+                    "Îles Vierges britanniques",
+                    "Îles Vierges des États-Unis",
+                    "Inde",
+                    "Indonésie",
+                    "Irak",
+                    "Iran",
+                    "Irlande",
+                    "Islande",
+                    "Israël",
+                    "Italie",
+                    "Jamaïque",
+                    "Japon",
+                    "Jersey",
+                    "Jordanie",
+                    "Kazakhstan",
+                    "Kenya",
+                    "Kirghizistan",
+                    "Kiribati",
+                    "Koweït",
+                    "Laos",
+                    "Lesotho",
+                    "Lettonie",
+                    "Liban",
+                    "Libéria",
+                    "Libye",
+                    "Liechtenstein",
+                    "Lituanie",
+                    "Luxembourg",
+                    "Macédoine",
+                    "Madagascar",
+                    "Malaisie",
+                    "Malawi",
+                    "Maldives",
+                    "Mali",
+                    "Malte",
+                    "Maroc",
+                    "Martinique",
+                    "Maurice",
+                    "Mauritanie",
+                    "Mayotte",
+                    "Mexique",
+                    "Moldavie",
+                    "Monaco",
+                    "Mongolie",
+                    "Monténégro",
+                    "Montserrat",
+                    "Mozambique",
+                    "Myanmar",
+                    "Namibie",
+                    "Nauru",
+                    "Népal",
+                    "Nicaragua",
+                    "Niger",
+                    "Nigéria",
+                    "Niue",
+                    "Norvège",
+                    "Nouvelle-Calédonie",
+                    "Nouvelle-Zélande",
+                    "Oman",
+                    "Ouganda",
+                    "Ouzbékistan",
+                    "Pakistan",
+                    "Palaos",
+                    "Panama",
+                    "Papouasie-Nouvelle-Guinée",
+                    "Paraguay",
+                    "Pays-Bas",
+                    "Pérou",
+                    "Philippines",
+                    "Pitcairn",
+                    "Pologne",
+                    "Polynésie française",
+                    "Porto Rico",
+                    "Portugal",
+                    "Qatar",
+                    "R.A.S. chinoise de Hong Kong",
+                    "R.A.S. chinoise de Macao",
+                    "régions éloignées de l’Océanie",
+                    "République centrafricaine",
+                    "République démocratique du Congo",
+                    "République dominicaine",
+                    "République tchèque",
+                    "Réunion",
+                    "Roumanie",
+                    "Royaume-Uni",
+                    "Russie",
+                    "Rwanda",
+                    "Sahara occidental",
+                    "Saint-Barthélémy",
+                    "Saint-Kitts-et-Nevis",
+                    "Saint-Marin",
+                    "Saint-Martin",
+                    "Saint-Pierre-et-Miquelon",
+                    "Saint-Vincent-et-les Grenadines",
+                    "Sainte-Hélène",
+                    "Sainte-Lucie",
+                    "Samoa",
+                    "Samoa américaines",
+                    "Sao Tomé-et-Principe",
+                    "Sénégal",
+                    "Serbie",
+                    "Serbie-et-Monténégro",
+                    "Seychelles",
+                    "Sierra Leone",
+                    "Singapour",
+                    "Slovaquie",
+                    "Slovénie",
+                    "Somalie",
+                    "Soudan",
+                    "Sri Lanka",
+                    "Suède",
+                    "Suisse",
+                    "Suri'name'",
+                    "Svalbard et Île Jan Mayen",
+                    "Swaziland",
+                    "Syrie",
+                    "Tadjikistan",
+                    "Taïwan",
+                    "Tanzanie",
+                    "Tchad",
+                    "Terres australes françaises",
+                    "Territoire britannique de l'océan Indien",
+                    "Territoire palestinien",
+                    "Thaïlande",
+                    "Timor oriental",
+                    "Togo",
+                    "Tokelau",
+                    "Tonga",
+                    "Trinité-et-Tobago",
+                    "Tristan da Cunha",
+                    "Tunisie",
+                    "Turkménistan",
+                    "Turquie",
+                    "Tuvalu",
+                    "Ukraine",
+                    "Union européenne",
+                    "Uruguay",
+                    "Vanuatu",
+                    "Venezuela",
+                    "Viêt Nam",
+                    "Wallis-et-Futuna",
+                    "Yémen",
+                    "Zambie",
+                    "Zimbabwe"
+                ];
+                $(".recherche").autocomplete({
+                    source: availableTags,
+                    minLength: 3
+                });
+            });
+        });
+        /*End Api Map*/
+        /*Payement*/
+        $(document).on('click', "#strippay", function (e) {
+            for (var i = 1; i <= localStorage.getItem('_nbr'); i++) {
+                var isNom = false;
+                var isPrenom = false;
+                var isPays = false;
+
+                // Nom
+                if ($('input[name="nom' + i + '"]').val() != '' && $('input[name="nom' + i + '"]').val() != undefined) {
+                    isNom = true;
+                } else {
+                    isNom = false;
+                    $(".obligatoirenom" + i).css("display", "block");
+                }
+
+
+                // Prenom
+                if ($('input[name="prenom' + i + '"]').val() != '' && $('input[name="prenom' + i + '"]').val() != undefined) {
+                    isPrenom = true;
+                } else {
+                    isPrenom = false;
+                    $(".obligatoireprenom" + i).css("display", "block");
+                }
+
+
+                //Pays
+                if ($('input[name="pays' + i + '"]').val() != '' && $('input[name="pays' + i + '"]').val() != undefined) {
+                    isPays = true;
+                } else {
+                    isPays = false;
+                    $(".obligatoirepays" + i).css("display", "block");
+                }
+
+            }
+
+            if (isNom == true && isPrenom == true && isPays == true) {
+                $("#billet").fadeOut(1000).css("display", "none");
+                $("#tarrifs_details").fadeOut(1000).css("display", "none");
+                $("#paiement_info").fadeIn(1000).css("display", "block");
+                $("#validate_all").fadeIn(1000).css("display", "block");
+            }
+        });
+    </script>
+{% endblock %}
