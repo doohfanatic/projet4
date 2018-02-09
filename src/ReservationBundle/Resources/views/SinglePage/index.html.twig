@@ -1,8 +1,6 @@
 {% extends 'base.html.twig' %}
 {% block body %}
-
     <div id="content" style="display:none">
-
         <div class="container" style="background:#f5f5f5">
             <div class="row" style="margin-top:30px; margin-bottom:30px;">
                 <ul id="breadcrumbs">
@@ -14,11 +12,9 @@
             <div id="loading_bar" style="display: none; margin: 294px 895px; position: absolute; z-index: 500;">
                 <img class="img-circle img-responsive" width="20px"
                      src="{{ asset('images/loading_pr2.gif') }}">
-
             </div>
             <form action="{{ path('get_info') }}" method="POST" id="payment-form">
                 <div class="payment-errors"></div>
-
                 <div class="row">
                     <div class="col-md-12">
                         {% include('ReservationBundle:SinglePage:reservation-form.html.twig') %}
@@ -28,7 +24,6 @@
                         {% include('ReservationBundle:SinglePage:stripe-form.html.twig') %}
                     </div>
                 </div>
-
                 <div id="validate_all" class="button-wrapper" style="margin-left: 52%; display: none;">
                     <button class="a-btn" style="margin-left: -9px;">
                         <span class="a-btn-text">Validez votre reservation</span>
@@ -41,32 +36,21 @@
             </form>
         </div>
     </div>
-
 {% endblock %}
 {% block javascripts %}
     <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('jquery-ui-1.12.1/jquery-ui.js') }}"></script>
     <script src="{{ asset('date-picker/js/bootstrap-datepicker.min.js') }}"></script>
-    <script src="{{ asset('js/popper.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-
+    <script src="{{ asset('date-picker/locales/bootstrap-datepicker.fr.min.js') }}"></script>
     <script type="text/javascript">
         $(document).on("click", "#acheterBtn", function () {
             $("#header_nav").fadeIn(1000).css("display", "none");
             $('#content').fadeIn(1000).css("display", "block");
         });
-        /*$('#goHome').click(function (e) {
-            e.preventDefault();
-            $("#header_nav").fadeIn(1000).css("display", "block");
-            $('#content').fadeIn(1000).css("display", "none");
-        });*/
-
         $('#loadingBtn').click(function (e) {
             $("#loading_bar").fadeIn(1000).css("display", "block");
         });
         $('#loadingcacher').click(function (e) {
             $("#loading_bar").fadeIn(1000).css("display", "none");
         });
-
     </script>
 {% endblock %}

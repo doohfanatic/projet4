@@ -10,6 +10,12 @@ namespace ReservationBundle\Repository;
  */
 class StatistiqueRepository extends \Doctrine\ORM\EntityRepository
 {
+    /**
+     * Une methode qui permet de vérifier la disponibilité de la date selectionnez
+     * par le visiteur
+     * @param $date
+     * @return array
+     */
     public function verifieDisponibiliteByDate($date){
 
         $qb = $this->createQueryBuilder('s');
@@ -21,7 +27,7 @@ class StatistiqueRepository extends \Doctrine\ORM\EntityRepository
     }
 
     /**
-     * Ajout ou mise jour des billet vendu dans le statistique
+     *  Mise à jour des billets vendu dans le statistique
      * @param $date
      */
     public function updateStatByDate($date,$nombreBillet){
@@ -34,3 +40,14 @@ class StatistiqueRepository extends \Doctrine\ORM\EntityRepository
         return $qb->getQuery()->getSingleScalarResult();
     }
 }
+
+
+
+
+
+
+
+
+
+
+

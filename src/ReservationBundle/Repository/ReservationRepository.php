@@ -10,6 +10,12 @@ namespace ReservationBundle\Repository;
  */
 class ReservationRepository extends \Doctrine\ORM\EntityRepository
 {
+
+    /**
+     * Une methode pour recupérer les billets à partir id de l'utilisateurs
+     * @param $user_id
+     * @return array
+     */
     public function  getBilletByUserId($user_id)
     {
 

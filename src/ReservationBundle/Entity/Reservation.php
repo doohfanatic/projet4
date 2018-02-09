@@ -3,6 +3,7 @@
 namespace ReservationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Reservation
@@ -25,18 +26,21 @@ class Reservation
      * @var \DateTime
      *
      * @ORM\Column(name="jour", type="date", length=255)
+     * @Assert\NotBlank(message = "Veillez choisir votre jour de résérvation")
      */
     private $jour;
 
     /**
      * @ORM\ManyToOne(targetEntity="ReservationBundle\Entity\User")
      * @ORM\JoinColumn(nullable=false)
+     * @Assert\NotBlank(message = "Champ obligatoire")
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="ReservationBundle\Entity\Billet")
      * @ORM\JoinColumn(nullable=false)
+     * @Assert\Valid
      */
 
     private $billets;

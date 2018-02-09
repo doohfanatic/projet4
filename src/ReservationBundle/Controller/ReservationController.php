@@ -69,36 +69,28 @@ class ReservationController extends Controller
 
     public function addReservation($data)
     {
+        $em = $this->getDoctrine()->getManager();
+
         $user = new User();
         $user->setEmail($data['emailclient']);
         $user->setNom($data['nomclient']);
-        //$user->setPrenom($data['prenomclient']);
 
-        $em = $this->getDoctrine()->getManager();
         $em->persist($user);
         $em->flush();
 
         for ($i = 1; $i <= $data['nb_billet']; $i++) {
-
-            $doctrinemanager = $this->getDoctrine()->getManager();
-
             // On récupère le tarrif par $libelle
-            $tarrif_id = $doctrinemanager
-                ->getRepository('ReservationBundle:Tarrif')
+            $tarrif_id = $em->getRepository('ReservationBundle:Tarrif')
                 ->getTarrifIdByLibelle($data["motif$i"]);
-            $tarrif = $doctrinemanager
-                ->getRepository('ReservationBundle:Tarrif')
+            $tarrif = $em->getRepository('ReservationBundle:Tarrif')
                 ->find($tarrif_id[0]['id']);
 
             $billet = new Billet();
             // On crée l'instance de la classe qui va generer la code de reservation
             $generator = new RandomStringGenerator;
 
-            // Initialisation longeur code
-            $longeurCode = 32;
-
             // Appel à la methode pour génerer
-            $code_de_reservation = $generator->generate($longeurCode);
+            $code_de_reservation = $generator->generate(20);
 
             $billet->setCodeDeReservation($code_de_reservation);
             $billet->setTarrifs($tarrif);
@@ -115,9 +107,9 @@ class ReservationController extends Controller
             $reservation->setBillets($billet);
             $reservation->setUser($user);
 
-            $doctrinemanager->persist($billet);
-            $doctrinemanager->persist($reservation);
-            $doctrinemanager->flush();
+            $em->persist($billet);
+            $em->persist($reservation);
+            $em->flush();
 
         }
         /**
@@ -151,6 +143,7 @@ class ReservationController extends Controller
             'description' => $data['nomclient'],
             'email' => $data['emailclient']
         ]);
+
         $this->getStripeInfo('charges', [
             'amount' => $data['montant_total'] * 100,
             'currency' => 'eur',
@@ -159,8 +152,7 @@ class ReservationController extends Controller
 
         $this->addReservation($data);
 
-        $request->getSession()
-            ->getFlashBag()
+        $request->getSession()->getFlashBag()
             ->add('success', 'Réservation effectué avec succès, merci de votre confiance');
         $url = $this->generateUrl('home_page');
 
@@ -174,7 +166,6 @@ class ReservationController extends Controller
      */
     public function verificationBilletAction(Request $request)
     {
-
         $data = $request->query->all();
 
         $em = $this->getDoctrine()->getManager();
@@ -217,7 +208,6 @@ class ReservationController extends Controller
         //On verifie d'abord si la date existe
         $statistique = $em->getRepository('ReservationBundle:Statistique')
             ->verifieDisponibiliteByDate(new \DateTime($date));
-        //dump($statistique);die();
         //Si la date existe on fait la mise jour de nombre de billet
         if ($statistique) {
             $totalBillet = $statistique[0]['nbBilletVendu'] + $nbrBilletAcheter;

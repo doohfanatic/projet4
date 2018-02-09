@@ -41,21 +41,21 @@
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('date-picker/js/bootstrap-datepicker.min.js') }}"></script>
     <script src="{{ asset('date-picker/locales/bootstrap-datepicker.fr.min.js') }}"></script>
-
-
-    {#<script src="{{ asset('jquery-ui-1.12.1/jquery-ui.js') }}"></script>#}
-
+    <script src="{{ asset('jquery-ui-1.12.1/jquery-ui.js') }}"></script>
 
     <script type="text/javascript">
 
-        $('#validation').hide();
+        $('#validation').html('');
         $('#etapeSuivant').click(function (e) {
             e.preventDefault();
 
             $('#etapeSuivant').attr("disabled", true);
 
             var nombre_billet = $('#nb_billet').val();
-            if (nombre_billet != undefined && nombre_billet != '') {
+            var date_reservation_val = $('#date_reservation_formated').val();
+            var type_billet = $('select[name="type_billet"]').val();
+            var valid_billet = getErrorBillet(nombre_billet);
+            if (valid_billet == true && type_billet != '' && date_reservation_val != '') {
                 $('#etape_reservation').removeAttr('class').attr('class', '');
 
                 $("#loading_bar").fadeIn(1000).css("display", "block");
@@ -66,10 +66,10 @@
                     data: {date: sectedDateFormated},
                     success: function (data) {
                         if (data.content.message != "disponible") {
-                            $('#error_date_reservation').css('display', 'block');
+                            $('#error_date_reservation').css('display', 'block').html('Date non distponible veuillez séléctionnez un autre date');
                             $('#etapeSuivant').attr("disabled", true);
                         } else {
-                            $('#error_date_reservation').css('display', 'none');
+                            $('#error_date_reservation').css('display', 'none').html('');
                             $('#etapeSuivant').attr("disabled", false);
 
                             localStorage.setItem('_nbr', nombre_billet);
@@ -107,8 +107,16 @@
                 }).done(function () {
                     $("#loading_bar").fadeOut(2000).css("display", "none");
                 });
+            } else if(valid_billet == true && type_billet != '' && date_reservation_val == '') {
+                $('#error_date_reservation').css('display','block').html('Veuillez choisir votre date de résérvation');
+            } else if(valid_billet == true && type_billet == '' && date_reservation_val != '') {
+                $('#type_billet').html('Veuillez choisir le type de votre billet');
+            } else if(valid_billet != true && date_reservation_val != '' && type_billet != '') {
+                $('#validation').html(valid_billet);
             } else {
-                $('#validation').show();
+                $('#validation').html(valid_billet);
+                $('#error_date_reservation').css('display','block').html('Veuillez choisir votre date de résérvation');
+                $('#type_billet').html('Veuillez choisir le type de votre billet');
             }
             $('#date_reservation').html($('#my_hidden_input').val());
         });
@@ -116,6 +124,18 @@
             var html = '';
             html += '<div class="col-sm-6"><input type="text" class="' + my_class + '" name="' + name + index + '" id="' + index + '" placeholder="' + placeholder + '" required> <br><em class="error-field obligatoire' + name + index + '" style="display:none">Ce champs est obligatoire</em></div>';
             return html;
+        }
+
+        function getErrorBillet(nombre_billet){
+            if(nombre_billet != undefined && nombre_billet != '') {
+                if ($.isNumeric(nombre_billet) && nombre_billet > 0) {
+                    return true;
+                }else{
+                    return 'Valeur non valide';
+                }
+            }else{
+                return 'Veuillez entrez le nombre de billet';
+            }
         }
 
         function getTotal(nb) {

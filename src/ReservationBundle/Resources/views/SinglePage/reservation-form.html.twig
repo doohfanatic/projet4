@@ -6,26 +6,25 @@
             <input type="hidden" id="my_hidden_input" name="date_reservation" required>
             <input type="hidden" id="date_reservation_formated" name="date_reservation_formated" required>
 
-            <div class="alert alert-danger" id="error_date_reservation" style="display: none;"> Date non distponible
-                veuillez séléctionnez un autre date
-            </div>
-
+            <div class="alert alert-danger" id="error_date_reservation" style="display: none;"></div>
         </div>
 
         <div class="form-row">
             <div class="form-group col-md-12">
                 <label for="nb_billet" class="col-form-label">Type de billet </label>
                 <select name="type_billet" class="form-control">
-                    <option value="journee">Journée</option>
+                    <option selected hidden>--- choisissez le type de billet ---</option>
+                    <option value="journee" id="journee_type" disabled>Journée</option>
                     <option value="demi-journee">Demi-journée</option>
                 </select>
-
+                <br>
+                <em class="error-field" id="type_billet"></em>
             </div>
             <div class="form-group col-md-12">
                 <label for="nb_billet" class="col-form-label">Choisissez le nombre de billets</label>
-                <input type="number" class="form-control" id="nb_billet" name="nb_billet" required>
+                <input type="number" class="form-control" placeholder="nombre de billet" id="nb_billet" name="nb_billet" required>
                 <br>
-                <em class="error-field" id="validation">Veuillez entrez le nombre de billet</em>
+                <em class="error-field" id="validation"></em>
             </div>
         </div>
     </div>
@@ -51,7 +50,8 @@
     <script src="{{ asset('date-picker/locales/bootstrap-datepicker.fr.min.js') }}"></script>
     <script type="text/javascript">
         var now = new Date();
-        var disabled_dates = ["1-5", "1-11", "25-12"];
+        var disabled_dates_param = "{{ container.parameter('date_fermetures')|join(',') }}";
+        var disabled_dates = disabled_dates_param.split(',');
 
         $('#date_visite').datepicker({
             autoclose: true,
@@ -67,18 +67,54 @@
                 return (disabled_dates.indexOf(dt_ddmm) == -1);
             }
         }).on('changeDate', function (e) {
+            $('#error_date_reservation').css('display','none').html('   ');
             var fullDate = dateFr(e.date);
             var selectedDate = new Date(e.date);
             var sectedDateFormated = getFormattedDate(selectedDate);
             $('#date_reservation_formated').val(sectedDateFormated);
             $('#my_hidden_input').val(fullDate);
+
+            var current_hour = new Date();
+            var date_res = $('#date_reservation_formated').val();
+            var date_now = getFormattedDate(now);
+            if(date_now == date_res && current_hour.getHours() > 13){
+                $('#journee_type').attr('disabled',true);
+            }else{
+                $('#journee_type').attr('disabled',false);
+            }
         });
 
-        $('#my_hidden_input').val(dateFr(now));
-        $('#date_reservation_formated').val(getFormattedDate(now));
+
+        /*$('#etapeSuivan').click(function (e) {
+            e.preventDefault();
+            var data = new FormData();
+            data.append('date_reservation_formated', $('#date_reservation_formated').val());
+
+            $.ajax({
+                type: 'post',
+                url: '/validation-etape-un',
+                data: data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(data){
+                    console.log(data);
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            })
+        });*/
+
+        /*$('#my_hidden_input').val(dateFr(now));
+        $('#date_reservation_formated').val(getFormattedDate(now));*/
         $("#nb_billet").keyup(function () {
-            $('#validation').hide();
+            $('#validation').html('');
             $('#etapeSuivant').attr("disabled", false);
+        });
+
+        $('select[name="type_billet"]').click(function(){
+            $('#type_billet').html('');
         });
 
         function getFormattedDate(date) {
@@ -94,7 +130,6 @@
         }
         //function pour faire la date en français
         function dateFr(date) {
-
             var mois = new Array("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "decembre");
             // on recupere la date
             var date = new Date(date);

@@ -7,102 +7,100 @@
     <link href="https://fonts.googleapis.com/css?family=Teko:400,500,600,700" rel="stylesheet">
 </head>
 <body>
-<div style="color: #000; font-family: Arial; font-size: 17px; padding: 0; margin: 0; line-height: normal;">
-<table style="background-color: #BDBDBD;" width="100%" border="0" cellspacing="0" cellpadding="0"
-       align="center" class="full">
-    <tr>
-        <td height="17"></td>
-    </tr>
-    <tr>
-        <td>
-            {% for billet in billets %}
-                <table width="740" bgcolor="#ffffff" border="0" cellspacing="0" cellpadding="0" align="center" style=""
-                       valign="top">
-                    <tr>
-                        <td colspan="3" height="6"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" align="center" height="61">
-                            <span style="font-size: 26px;line-height: 30px;font-weight: 300;">Musée du Louvre</span><br>
-                            <a href=""><img src="http://www.louvre.fr/sites/all/themes/louvre/img/data/logo-louvre.jpg"
-                                            width="210"></a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" height="17"></td>
-                    </tr>
-                    <tr>
-                        <td width="40"></td>
-                        <td align="center">
-                            <center>
+    <div style="color: #000; font-family: Arial; font-size: 17px; padding: 0; margin: 0; line-height: normal;">
+    <table style="background-color: #BDBDBD;" width="100%" border="0" cellspacing="0" cellpadding="0"
+           align="center" class="full">
+        <tr>
+            <td height="17"></td>
+        </tr>
+        <tr>
+            <td>
+                {% for billet in billets %}
+                    <table width="740" bgcolor="#ffffff" border="0" cellspacing="0" cellpadding="0" align="center" style=""
+                           valign="top">
+                        <tr>
+                            <td colspan="3" height="6"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="center" height="61">
+                                <span style="font-size: 26px;line-height: 30px;font-weight: 300;">Musée du Louvre</span><br>
+                                <a href=""><img src="http://www.louvre.fr/sites/all/themes/louvre/img/data/logo-louvre.jpg"
+                                                width="210"></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" height="17"></td>
+                        </tr>
+                        <tr>
+                            <td width="40"></td>
+                            <td align="center">
+                                <center>
 	        				<span style="display: table;font-size: 16px;">
                                 Date de réservation :
                                 <span style="font-size: 18px;line-height: 30px;font-weight: 300;">
                                 {{ billet.jour|date('d-m-Y') }}
                                     </span>
 	        				</span>
-                            </center>
-                        </td>
-                        <td width="40"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" height="17"></td>
-                    </tr>
-                    <tr>
-                        <td width="40"></td>
-                        <td align="center">
-                            <span style="color: #0091ea; font-family: teko; border: 1px solid #424242; border-radius: 3px; padding: 5px 20px; text-decoration: none;">{{ billet.billets.tarrifs.libelle }}</span>
-                            <span target="_blank"
-                                  style=" margin-left: 20px; color: #0091ea; font-family: teko; border: 1px solid #424242; border-radius: 3px; padding: 5px 20px; text-decoration: none;">{{ billet.billets.tarrifs.montant }}
-                                Euro</span>
-                        </td>
-                        <td width="40"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" height="27"></td>
-                    </tr>
-                    <tr>
-                        <td width="40"></td>
-                        <td align="center">
-                            <center>
+                                </center>
+                            </td>
+                            <td width="40"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" height="17"></td>
+                        </tr>
+                        <tr>
+                            <td width="40"></td>
+                            <td align="center">
+                                <span style="color: #0091ea; font-family: teko; border: 1px solid #424242; border-radius: 3px; padding: 5px 20px; text-decoration: none;">{{ billet.billets.tarrifs.libelle }}</span>
+                                <span target="_blank"
+                                      style=" margin-left: 20px; color: #0091ea; font-family: teko; border: 1px solid #424242; border-radius: 3px; padding: 5px 20px; text-decoration: none;">{{ billet.billets.tarrifs.montant }}
+                                    Euro</span>
+                            </td>
+                            <td width="40"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" height="27"></td>
+                        </tr>
+                        <tr>
+                            <td width="40"></td>
+                            <td align="center">
+                                <center>
 	        				<span style="font-size: 26px;line-height: 30px;font-weight: 300;">
                                  {{ billet.billets.nom }} {{ billet.billets.prenom }}
 	        				</span>
-                            </center>
-                        </td>
-                        <td width="40"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" height="17"></td>
-                    </tr>
+                                </center>
+                            </td>
+                            <td width="40"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" height="17"></td>
+                        </tr>
 
-                    <tr>
-                        <td width="40"></td>
-                        <td align="center" height="30">
-                            Code de réservation :
-                        <span style="font-size: 18px;line-height: 30px;font-weight: 300;">
+                        <tr>
+                            <td width="40"></td>
+                            <td align="center" height="30">
+                                Code de réservation :
+                                <span style="font-size: 18px;line-height: 30px;font-weight: 300;">
                             {{ billet.billets.codeDeReservation }}
                             </span>
-                        </td>
-                        <td width="40"></td>
+                            </td>
+                            <td width="40"></td>
 
-                    </tr>
-                    <tr>
-                        <td colspan="3" height="6"></td>
-                    </tr>
+                        </tr>
+                        <tr>
+                            <td colspan="3" height="6"></td>
+                        </tr>
 
-                    <tr>
-                        <td colspan="3" align="center" height="17" style="background-color:#BDBDBD;">
-                        </td>
-                    </tr>
+                        <tr>
+                            <td colspan="3" align="center" height="17" style="background-color:#BDBDBD;">
+                            </td>
+                        </tr>
 
-                </table>
-            {% endfor %}
-        </td>
-    </tr>
-</table>
-
-</table>
-    </div>
+                    </table>
+                {% endfor %}
+            </td>
+        </tr>
+    </table>
+</div>
 </body>
 </html>
