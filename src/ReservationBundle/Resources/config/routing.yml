@@ -2,6 +2,3 @@ reservation_place:
     resource: "@ReservationBundle/Resources/config/routing/reservation.yml"
     prefix:   /
 
-validation_form:
-    resource: "@ReservationBundle/Resources/config/routing/validation.yml"
-    prefix:   /
