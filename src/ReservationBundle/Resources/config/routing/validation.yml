@@ -1,4 +1,0 @@
-step_one:
-    path:     /validation-etape-un
-    defaults: { _controller: "ReservationBundle:Validation:index" }
-    methods:  POST

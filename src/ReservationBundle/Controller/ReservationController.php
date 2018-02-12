@@ -57,6 +57,9 @@ class ReservationController extends Controller
 
     }
 
+    /**
+     * qui affiche la première page d'acceuil du site
+     */
     public function indexAction(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
@@ -67,6 +70,11 @@ class ReservationController extends Controller
         return $this->render('ReservationBundle:SinglePage:index.html.twig', ['tarrifs' => $tarrifs]);
     }
 
+    /**
+     * une fonction qui permet de sauvegarde la reservation dans la base de données
+     * @param $data
+     * @return Response
+     */
     public function addReservation($data)
     {
         $em = $this->getDoctrine()->getManager();
