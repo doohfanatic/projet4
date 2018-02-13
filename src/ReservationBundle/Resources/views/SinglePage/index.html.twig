@@ -47,9 +47,6 @@
     <script src="{{ asset('date-picker/js/bootstrap-datepicker.min.js') }}"></script>
     <script src="{{ asset('date-picker/locales/bootstrap-datepicker.fr.min.js') }}"></script>
     <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-    {#
-        <script src="{{ asset('js/stripe.js') }}"></script>
-    #}
     <script type="text/javascript">
         $(document).on("click", "#acheterBtn", function () {
             $("#header_nav").fadeIn(1000).css("display", "none");
@@ -158,7 +155,7 @@
                     data: {date: sectedDateFormated},
                     success: function (data) {
                         if (data.content.message != "disponible") {
-                            $('#error_date_reservation').css('display', 'block').html('Date non distponible veuillez séléctionnez un autre date');
+                            $('#error_date_reservation').css('display', 'block').html('Date non disponible veuillez séléctionnez un autre date');
                             $('#etapeSuivant').attr("disabled", true);
                         } else {
                             $('#error_date_reservation').css('display', 'none').html('');
@@ -180,6 +177,7 @@
                                 '<div class="col-sm-6">' +
                                 '<p style="display: none; font-size: 14px; margin-left: 5px;" id="reduit' + i + '">il sera nécessaire de présenter votre carte d’étudiant, militaire ou équivalent lors de l’entrée</p>' +
                                 '<p id="nonreduit' + i + '"><input type="text" class="datepickerbirth form-control" name="datenaissance' + i + '" id="' + i + '" placeholder="Date de naissance" autocomplete="off" readonly></p>' +
+                                '<em class="error-field obligatoiretarif' + i + '"></em>'+
                                 '</div>' +
                                 createTag(i, "pays", "Pays", "validate recherche form-control") +
                                 '</div>' +
@@ -214,7 +212,7 @@
         });
         function createTag(index, name, placeholder, my_class) {
             var html = '';
-            html += '<div class="col-sm-6"><input type="text" class="' + my_class + '" name="' + name + index + '" id="' + index + '" placeholder="' + placeholder + '" required> <br><em class="error-field obligatoire' + name + index + '" style="display:none">Ce champs est obligatoire</em></div>';
+            html += '<div class="col-sm-6"><input type="text" class="' + my_class + '" name="' + name + index + '" id="' + index + '" placeholder="' + placeholder + '" required> <br><em class="error-field obligatoire' + name + index + '"></em></div>';
             return html;
         }
 
@@ -272,6 +270,30 @@
             }
         }
 
+        function validInput($string){
+            if($string != '' && $string != undefined && $string.trim()){
+                if (isLetter($string) == true){
+                    return true;
+                }
+                return 'Valeur non valide';
+            }
+            return 'Champ obligatoire';
+        }
+
+        function isLetter(str) {
+            if(str.match(/^([a-zA-Z_ \u00C0-\u00ff]+)$/i)) {
+                return true;
+            }
+            return false;
+        }
+
+        function isTarifValid(date_val, check_val){
+            if((date_val == '' || date_val == undefined) && check_val == false){
+                return 'Champ obligatoire'
+            }
+            return true;
+        }
+
         $('#btnPaiement').click(function () {
             $('#billet').fadeIn(1000).css("display", "none");
             $("#paiement_info").fadeOut(1000).css("display", "block");
@@ -283,8 +305,9 @@
 
             var id_selector = e.target.id;
             $(".validate").keyup(function () {
-                $(".error-field").css("display", "none");
+                $(".error-field").html("");
             });
+            $('.obligatoiretarif'+id_selector).html('');
             //$('#' + id_selector).attr('focus', 'geolocate');
             $('input[name="datenaissance' + id_selector + '"]').datepicker({
                 autoclose: true,
@@ -297,6 +320,7 @@
             $('input[name="datenaissance' + id_selector + '"]').on('changeDate', function (data) {
                 var fullDate = data.date;
                 dateDiff(fullDate, id_selector);
+                //$('.obligatoiretarif'+id_selector).html('');
                 $('#montant_total').html(getTotal(localStorage.getItem('_nbr')) + '<span style="float: right;">€');
                 $('input[name="montant_total"]').val(getTotal(localStorage.getItem('_nbr')));
             });
@@ -589,43 +613,49 @@
                 });
             });
         });
-        /*End Api Map*/
+
         /*Payement*/
         $(document).on('click', "#strippay", function (e) {
             for (var i = 1; i <= localStorage.getItem('_nbr'); i++) {
                 var isNom = false;
                 var isPrenom = false;
                 var isPays = false;
+                var isTarif = false;
 
                 // Nom
-                if ($('input[name="nom' + i + '"]').val() != '' && $('input[name="nom' + i + '"]').val() != undefined) {
+                if (validInput($('input[name="nom' + i + '"]').val()) == true) {
                     isNom = true;
                 } else {
                     isNom = false;
-                    $(".obligatoirenom" + i).css("display", "block");
+                    $(".obligatoirenom" + i).html(validInput($('input[name="nom' + i + '"]').val()));
                 }
 
-
                 // Prenom
-                if ($('input[name="prenom' + i + '"]').val() != '' && $('input[name="prenom' + i + '"]').val() != undefined) {
+                if (validInput($('input[name="prenom' + i + '"]').val()) == true) {
                     isPrenom = true;
                 } else {
                     isPrenom = false;
-                    $(".obligatoireprenom" + i).css("display", "block");
+                    $(".obligatoireprenom" + i).html(validInput($('input[name="prenom' + i + '"]').val()));
                 }
 
-
                 //Pays
-                if ($('input[name="pays' + i + '"]').val() != '' && $('input[name="pays' + i + '"]').val() != undefined) {
+                if (validInput($('input[name="pays' + i + '"]').val()) == true) {
                     isPays = true;
                 } else {
                     isPays = false;
-                    $(".obligatoirepays" + i).css("display", "block");
+                    $(".obligatoirepays" + i).html(validInput($('input[name="pays' + i + '"]').val()));
                 }
 
+                //Tarif
+                if (isTarifValid($('input[name="datenaissance' + i + '"]').val(), $('input[name="tarif_reduit' + i + '"]').is(":checked")) == true) {
+                    isTarif = true;
+                } else {
+                    isTarif = false;
+                    $(".obligatoiretarif" + i).html(isTarifValid($('input[name="datenaissance' + i + '"]').val(), $('input[name="tarif_reduit' + i + '"]').is(":checked")));
+                }
             }
 
-            if (isNom == true && isPrenom == true && isPays == true) {
+            if (isNom == true && isPrenom == true && isPays == true && isTarif == true) {
                 $("#billet").fadeOut(1000).css("display", "none");
                 $("#tarrifs_details").fadeOut(1000).css("display", "none");
                 $("#paiement_info").fadeIn(1000).css("display", "block");
