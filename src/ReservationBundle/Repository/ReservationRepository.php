@@ -18,7 +18,6 @@ class ReservationRepository extends \Doctrine\ORM\EntityRepository
      */
     public function  getBilletByUserId($user_id)
     {
-
         $qb = $this->createQueryBuilder('r');
         $qb->select('r')
             ->where('r.user = :user')

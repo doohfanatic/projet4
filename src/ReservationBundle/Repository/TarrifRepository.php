@@ -18,6 +18,6 @@ class TarrifRepository extends \Doctrine\ORM\EntityRepository
             ->where('t.libelle = :libelle')
             ->setParameter('libelle', $libelle);
 
-        return $qb->getQuery()->getScalarResult();
+        return $qb->getQuery()->getSingleResult();
     }
 }

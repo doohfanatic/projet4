@@ -19,45 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 class ReservationController extends Controller
 {
     /**
-     * @param $endpoint
-     * @param $data
-     * @return mixed
-     */
-    protected function getStripeInfo($endpoint, $data)
-    {
-        $ch = curl_init();
-        curl_setopt_array($ch, [
-            CURLOPT_URL => "https://api.stripe.com/v1/$endpoint",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_USERPWD => $this->container->getParameter('stripe_private_key'),
-            CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-            CURLOPT_POSTFIELDS => http_build_query($data)
-        ]);
-        $response = json_decode(curl_exec($ch));
-        curl_close($ch);
-        if (property_exists($response, 'error')) {
-            throw new Exception($response->error->message);
-        }
-        return $response;
-    }
-
-    /**
-     * send mail pour envoyer les billets au visiteur
-     */
-    protected function sendBillet($email, $billets)
-    {
-        $message = \Swift_Message::newInstance()
-            ->setSubject('Biller de reservation')
-            ->setFrom(['envoimailtest06@gmail.com' => 'ReservationMuseum'])
-            ->setTo($email)
-            ->setCharset('utf-8')
-            ->setContentType('text/html')
-            ->setBody($this->renderView('ReservationBundle:billet:template-billet.html.twig', ['billets' => $billets]));
-        return $this->get('mailer')->send($message);
-
-    }
-
-    /**
      * qui affiche la première page d'acceuil du site
      */
     public function indexAction(Request $request)
@@ -77,6 +38,7 @@ class ReservationController extends Controller
      */
     public function addReservation($data)
     {
+        $mail_manager = $this->get('reservation_service');
         $em = $this->getDoctrine()->getManager();
 
         $user = new User();
@@ -90,8 +52,9 @@ class ReservationController extends Controller
             // On récupère le tarrif par $libelle
             $tarrif_id = $em->getRepository('ReservationBundle:Tarrif')
                 ->getTarrifIdByLibelle($data["motif$i"]);
+
             $tarrif = $em->getRepository('ReservationBundle:Tarrif')
-                ->find($tarrif_id[0]['id']);
+                ->find($tarrif_id['id']);
 
             $billet = new Billet();
             // On crée l'instance de la classe qui va generer la code de reservation
@@ -127,7 +90,7 @@ class ReservationController extends Controller
             ->getBilletByUserId($user->getId());
 
         //Envoi par email des billets
-        $this->sendBillet($user->getEmail(), $billets);
+        $mail_manager->sendBillet($user->getEmail(), $billets);
 
         //Mise à jour on ajout Statistique
         $this->addOrUpdateStatistiqueByDate($data['date_reservation_formated'], $data['nb_billet']);
@@ -144,15 +107,15 @@ class ReservationController extends Controller
      */
     public function getInfoAction(Request $request)
     {
+        $stripe_manager = $this->get('reservation_service');
         $data = $request->request->all();
-
-        $customer = $this->getStripeInfo('customers', [
+        $customer = $stripe_manager->getStripeInfo('customers', [
             'source' => $data['stripeToken'],
             'description' => $data['nomclient'],
             'email' => $data['emailclient']
         ]);
 
-        $this->getStripeInfo('charges', [
+        $stripe_manager->getStripeInfo('charges', [
             'amount' => $data['montant_total'] * 100,
             'currency' => 'eur',
             'customer' => $customer->id
