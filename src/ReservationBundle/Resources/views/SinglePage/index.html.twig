@@ -676,27 +676,34 @@
         $('input[name="nomclient"]').on('keydown',function (e) {
             $('#nomclient').html('');
         });
+        $('input[name="cvc"]').on('keydown',function (e) {
+            $('#cvc').html('');
+        });
         $_form.submit(function (e) {
             e.preventDefault();
             $_form.find('button').prop('disabled', true);
-            if($('input[name="emailclient"]').val() == '' || $('input[name="nomclient"]').val() == ''){
+            if($('input[name="emailclient"]').val() == '' || $('input[name="nomclient"]').val() == '' || $('input[name="cvc"]').val() == ''){
                 $_form.find('button').prop('disabled', false);
-                if($('input[name="emailclient"]').val() == '' && $('input[name="nomclient"]').val() != ''){
-                    $('#nomclient').html('');
-                    $('#emailclient').html('Champ obligatoire');
-                }
-                if($('input[name="emailclient"]').val() != '' && $('input[name="nomclient"]').val() == ''){
-                    $('#nomclient').html('Champ obligatoire');
+                if(isValidEmail($('input[name="emailclient"]').val()) == true){
                     $('#emailclient').html('');
+                }else{
+                    $('#emailclient').html(isValidEmail($('input[name="emailclient"]').val()));
                 }
-                if($('input[name="emailclient"]').val() == '' && $('input[name="nomclient"]').val() == ''){
-                    $('#nomclient').html('Champ obligatoire');
-                    $('#emailclient').html('Champ obligatoire');
+                if(validInput($('input[name="nomclient"]').val()) == true){
+                    $('#nomclient').html('');
+                }else{
+                    $('#nomclient').html(validInput($('input[name="nomclient"]').val()));
+                }
+                if($('input[name="cvc"]').val() == ''){
+                    $('#cvc').html('Champ obligatoire');
+                }else{
+                    $('#cvc').html('');
                 }
             }else{
                 $("#loading_pay").fadeIn(1000).css("display", "block");
                 $('#nomclient').html('');
                 $('#emailclient').html('');
+                $('#cvc').html('');
                 Stripe.card.createToken($_form,function (status, response) {
                     $("#loading_pay").fadeIn(1000).css("display", "block");
                     if(response.error){
@@ -710,12 +717,14 @@
                             $('#card_error').html('Veuillez saisir votre numéro de carte');
                         }
                         if(response.error.type == "card_error" && response.error.param == "exp_month") $('#exp_month').html('Votre carte n\'est plus valide');
+                        if(response.error.type == "card_error" && response.error.param == "cvc") $('#cvc').html('Code cvc invalide');
                         //$_form.find('.payment-errors').text(response.error.message);
                     }else{
                         $("#loading_pay").fadeIn(1000).css("display", "block");
                         $_form.find('#card_error').html();
                         $('#card_error').html('');
                         $('#exp_month').html('');
+                        $('#cvc').html('');
                         var _token = response.id;
                         $_form.append('<input type="hidden" name="stripeToken" value="'+_token+'" />');
                         $_form.get(0).submit();
@@ -723,5 +732,33 @@
                 })
             }
         });
+
+        function validInput($string){
+            if($string != '' && $string != undefined && $string.trim()){
+                if (isLetter($string) == true){
+                    return true;
+                }
+                return 'Valeur non valide';
+            }
+            return 'Champ obligatoire';
+        }
+
+        function isLetter(str) {
+            if(str.match(/^([a-zA-Z_ \u00C0-\u00ff]+)$/i)) {
+                return true;
+            }
+            return false;
+        }
+
+        function isValidEmail(email_cli) {
+            if(email_cli != '' && email_cli != undefined){
+                var pattern = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+                if(pattern.test(email_cli) == true){
+                    return true;
+                }
+                return 'Format non valide';
+            }
+            return 'Champ obligatoire';
+        }
     </script>
 {% endblock %}
