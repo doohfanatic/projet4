@@ -130,21 +130,10 @@ class ReservationController extends Controller
         return $this->redirect($url);
     }
 
-    /**
-     * Fontion pour verifier la disponibilite de la date de visite selectionnez par le visiteur
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function verificationBilletAction(Request $request)
+
+    public function verificationStatistique($statistique, $nombre_billet_max)
     {
-        $data = $request->query->all();
 
-        $em = $this->getDoctrine()->getManager();
-        $nombre_billet_max = $this->container->getParameter('nombre_billet_max');
-
-        $statistique = $em
-            ->getRepository('ReservationBundle:Statistique')
-            ->verifieDisponibiliteByDate(new \DateTime($data['date']));
         if ($statistique) {
             if ($statistique[0]['nbBilletVendu'] > $nombre_billet_max) {
                 $response = array(
@@ -172,6 +161,23 @@ class ReservationController extends Controller
 
         return new JsonResponse($response);
     }
+    /**
+     * Fontion pour verifier la disponibilite de la date de visite selectionnez par le visiteur
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function verificationBilletAction(Request $request)
+    {
+        $data = $request->query->all();
+        $em = $this->getDoctrine()->getManager();
+        $statistique = $em
+            ->getRepository('ReservationBundle:Statistique')
+            ->verifieDisponibiliteByDate(new \DateTime($data['date']));
+        $nombre_billet_max = $this->container->getParameter('nombre_billet_max');
+
+        return $this->verificationStatistique($statistique, $nombre_billet_max);
+    }
+
 
     public function  addOrUpdateStatistiqueByDate($date, $nbrBilletAcheter)
     {
