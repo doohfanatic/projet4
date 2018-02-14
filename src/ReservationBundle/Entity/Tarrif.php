@@ -3,6 +3,7 @@
 namespace ReservationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Tarrif
@@ -25,6 +26,7 @@ class Tarrif
      * @var int
      *
      * @ORM\Column(name="montant", type="integer")
+     * @Assert\NotBlank()
      */
     private $montant;
 
@@ -32,6 +34,7 @@ class Tarrif
      * @var string
      *
      * @ORM\Column(name="libelle", type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $libelle;
 

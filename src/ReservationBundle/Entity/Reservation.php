@@ -26,14 +26,14 @@ class Reservation
      * @var \DateTime
      *
      * @ORM\Column(name="jour", type="date", length=255)
-     * @Assert\NotBlank(message = "Veillez choisir votre jour de résérvation")
+     * @Assert\NotBlank()
      */
     private $jour;
 
     /**
      * @ORM\ManyToOne(targetEntity="ReservationBundle\Entity\User")
      * @ORM\JoinColumn(nullable=false)
-     * @Assert\NotBlank(message = "Champ obligatoire")
+     *
      */
     private $user;
 

@@ -3,6 +3,7 @@
 namespace ReservationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Statistique
@@ -25,6 +26,8 @@ class Statistique
      * @var string
      *
      * @ORM\Column(name="nb_billet_vendu", type="string", length=255)
+     * @Assert\NotBlank()
+     *
      */
     private $nbBilletVendu;
 
@@ -32,6 +35,8 @@ class Statistique
      * @var \DateTime
      *
      * @ORM\Column(name="date", type="date")
+     * @Assert\NotBlank()
+     * @Assert\Date()
      */
     private  $date;
     

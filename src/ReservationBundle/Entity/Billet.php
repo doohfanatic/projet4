@@ -3,6 +3,7 @@
 namespace ReservationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Billet
@@ -25,6 +26,7 @@ class Billet
      * @var string
      *
      * @ORM\Column(name="code_de_reservation", type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $codeDeReservation;
 
@@ -32,6 +34,7 @@ class Billet
      * @var string
      *
      * @ORM\Column(name="type_billet", type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $typeBillet;
 
@@ -39,6 +42,8 @@ class Billet
      * @var string
      *
      * @ORM\Column(name="nom", type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\Regex("/^([a-zA-Z_ \u00C0-\u00ff]+)$/")
      */
     private $nom;
 
@@ -46,6 +51,8 @@ class Billet
      * @var string
      *
      * @ORM\Column(name="prenom", type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\Regex("/^([a-zA-Z_ \u00C0-\u00ff]+)$/")
      */
     private $prenom;
 
@@ -53,6 +60,8 @@ class Billet
      * @var string
      *
      * @ORM\Column(name="pays", type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\Regex("/^([a-zA-Z_ \u00C0-\u00ff]+)$/")
      */
     private $pays;
 
@@ -60,6 +69,8 @@ class Billet
      * @var \DateTime
      *
      * @ORM\Column(name="date_de_naissance", type="date", length=255)
+     * @Assert\NotBlank()
+     * @Assert\Date()
      */
     private $date_de_naissance;
 

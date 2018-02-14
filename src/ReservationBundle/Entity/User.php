@@ -3,6 +3,7 @@
 namespace ReservationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * User
@@ -25,6 +26,8 @@ class User
      * @var string
      *
      * @ORM\Column(name="nom", type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\Regex("/^([a-zA-Z_ \u00C0-\u00ff]+)$/")
      */
     private $nom;
 
@@ -32,6 +35,10 @@ class User
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=255, unique=false)
+     * @Assert\NotBlank()
+     * @Assert\Email(
+     *     checkMX = true
+     * )
      */
     private $email;
 
