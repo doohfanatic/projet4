@@ -13,6 +13,10 @@ use ReservationBundle\Entity\Statistique;
 class ReservationControllerTest extends WebTestCase
 {
 
+    /**
+     * une fonction qui permet de tester si la page d'acceuil marche parfaitement sans erreur
+     *
+     */
     public function testIndex()
     {
         $client = static::createClient();
@@ -21,6 +25,9 @@ class ReservationControllerTest extends WebTestCase
         $this->assertContains('Détails', $crawler->filter('.etape1')->text());
     }
 
+    /**
+     * une fonction qui nous permet de verifier si dans le contenu div (Renseignements) de l'etape 2 contien une classe .etape2
+     */
     public function testBillet()
     {
         $client = static::createClient();
@@ -29,6 +36,10 @@ class ReservationControllerTest extends WebTestCase
         $this->assertContains('Renseignements', $crawler->filter('.etape2')->text());
     }
 
+    /**
+     * Une fonction qui permet de verifier la requête de verification de date de disponibilité
+     */
+
     public function testVerificationDisponibilite()
     {
         $client = static::createClient();
@@ -36,7 +47,10 @@ class ReservationControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 
-    public function testAjoutNouvelleTarrif()
+    /**
+     * une fonction qui permet de verifier si la verification du statistique fonctionne à la perfection
+     */
+    public function testFonctionVerificationStatistique()
     {
 
         $client = static::createClient();
