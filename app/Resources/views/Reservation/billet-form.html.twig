@@ -22,12 +22,53 @@
             </div>
             <form action="{{ path('info_billet') }}" method="POST" id="form_billet" novalidate>
                 <input type="hidden" id="nb_billet" name="nb_billet" value="{{ data.nb_billet }}">
-                <input type="hidden"  name="date_reservation_formated" value="{{ data.date_reservation_formated }}">
-                <input type="hidden"  name="date_reservation" value="{{ data.date_reservation }}">
-                <input type="hidden"  name="type_billet" value="{{ data.type_billet }}">
+                <input type="hidden" name="date_reservation_formated" value="{{ data.date_reservation_formated }}">
+                <input type="hidden" name="date_reservation" value="{{ data.date_reservation }}">
+                <input type="hidden" name="type_billet" value="{{ data.type_billet }}">
 
                 <div class="row">
                     <div id="billet" class="col-md-8">
+                        {% for i in 1..data.nb_billet %}
+                            <span class="text-center"> Billet {{ i }}</span>
+                            <div style="border: solid 1px; padding: 10px ;">
+                                <div class="row form-group">
+                                    <input type="hidden" value="0" id="montant{{ i }}" name="montant{{ i }}">
+                                    <input type="hidden" id="motif{{ i }}" name="motif{{ i }}">
+
+                                    <div class="col-sm-6">
+                                        <input type="text" class="validate form-control" name="nom{{ i }}" id="{{ i }}" placeholder="Nom" required=""><br>
+                                        <em class="error-field obligatoirenom{{ i }}"></em>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="validate form-control" name="prenom{{ i }}" id="{{ i }}" placeholder="Prenom" required=""><br>
+                                        <em class="error-field obligatoireprenom{{ i }}"></em>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <p style="display: none; font-size: 14px; margin-left: 5px;" id="reduit{{ i }}">
+                                            il sera nécessaire de présenter votre carte d’étudiant, militaire ou équivalent lors de l’entrée
+                                        </p>
+                                        <p id="nonreduit{{ i }}">
+                                            <input type="text" class="datepickerbirth form-control" name="datenaissance{{ i }}" id="{{ i }}"
+                                                   placeholder="Date de naissance" autocomplete="off" readonly="">
+                                        </p>
+                                        <em class="error-field obligatoiretarif{{ i }}"></em>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="validate recherche form-control"
+                                               name="pays{{ i }}" id="{{ i }}" placeholder="Pays" required=""><br>
+                                        <em class="error-field obligatoirepays{{ i }}"></em>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <input type="checkbox" name="tarif_reduit{{ i }}" id="{{ i }}">
+                                        <span style="margin-left: 10px;">Je bénéficie d'un tarif réduit</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                     <div class="col-md-4" style="display: block" id="tarrifs_details">
                         <div class="card" style="width: 20rem;">
@@ -52,7 +93,13 @@
                                             <div class="col-sm-4">Tarif</div>
                                             <div class="col-sm-4">Montant</div>
                                         </div>
-                                        <div class="row" id="tarif_content"></div>
+                                        <div class="row" id="tarif_content">
+                                            {% for i in 1..data.nb_billet %}
+                                                <div style="display: none;" class="numbillet{{ i }} col-sm-4"></div>
+                                                <div style="display: none;" class="tarif{{ i }} col-sm-4"></div>
+                                                <div style="display: none;" class="montant{{ i }} col-sm-4"></div>
+                                            {% endfor %}
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -83,40 +130,6 @@
 
     <!-- script pour la partie reservation -->
     <script type="text/javascript">
-        var nombre_billet = $('#nb_billet').val();
-        for (var i = 1; i <= nombre_billet; i++) {
-            $('#billet').append('<span class="text-center" > Billet ' + i + '</span>' +
-                '<div style="border: solid 1px; padding: 10px ;">' +
-                '<div class="row form-group">' +
-                '<input type="hidden" value="0" id="montant' + i + '" name="montant' + i + '"><input type="hidden" id="motif' + i + '" name="motif' + i + '">' +
-                createTag(i, "nom", "Nom", "validate form-control") + createTag(i, "prenom", "Prenom", "validate form-control") +
-                '</div>' +
-                '<div class="row">' +
-                '<div class="col-sm-6">' +
-                '<p style="display: none; font-size: 14px; margin-left: 5px;" id="reduit' + i + '">il sera nécessaire de présenter votre carte d’étudiant, militaire ou équivalent lors de l’entrée</p>' +
-                '<p id="nonreduit' + i + '"><input type="text" class="datepickerbirth form-control" name="datenaissance' + i + '" id="' + i + '" placeholder="Date de naissance" autocomplete="off" readonly></p>' +
-                '<em class="error-field obligatoiretarif' + i + '"></em>' +
-                '</div>' +
-                createTag(i, "pays", "Pays", "validate recherche form-control") +
-                '</div>' +
-                '<div class="row">' +
-                '<div class="col-sm-12"><input type="checkbox" name="tarif_reduit' + i + '" id="' + i + '"> <span style="margin-left: 10px;">Je bénéficie d\'un tarif réduit</span></div>' +
-                '</div>' +
-                '</div>');
-
-            $('#tarif #tarif_content').append(
-                '<div style="display: none;" class="numbillet' + i + ' col-sm-4"></div>' +
-                '<div style="display: none;" class="tarif' + i + ' col-sm-4"></div>' +
-                '<div style="display: none;" class="montant' + i + ' col-sm-4"></div>'
-            )
-        }
-
-        function createTag(index, name, placeholder, my_class) {
-            var html = '';
-            html += '<div class="col-sm-6"><input type="text" class="' + my_class + '" name="' + name + index + '" id="' + index + '" placeholder="' + placeholder + '" required> <br><em class="error-field obligatoire' + name + index + '"></em></div>';
-            return html;
-        }
-
         function getTotal(nb) {
             var total = 0;
             for (var i = 1; i <= nb; i++) {
@@ -255,7 +268,8 @@
 
             $('input[name="tarif_reduit' + id_selector + '"]').on('click', function (e) {
                 var defaultDate = $('input[name="datenaissance' + id_selector + '"]').val();
-                var mydate = new Date(defaultDate);
+                var date_reformat = defaultDate.split('-')[1] + '/' + defaultDate.split('-')[0] + '/' + defaultDate.split('-')[2];
+                var mydate = new Date(date_reformat);
                 if (e.target.checked == true) {
                     dateDiff('reduit', id_selector);
                     $('#montant_total').html(getTotal($('#nb_billet').val()) + '<span style="float: right;">€');
