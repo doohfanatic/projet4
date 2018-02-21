@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('date-picker/css/bootstrap-datepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/stripe.css') }}">
+{% endblock %}
+{% block body %}
+    {% include "header.html.twig" %}
+
+{% endblock %}

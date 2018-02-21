@@ -1,0 +1,184 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('date-picker/css/bootstrap-datepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/stripe.css') }}">
+{% endblock %}
+{% block body %}
+    <div id="content">
+        <div class="container" style="background:#f5f5f5">
+            <div class="row" style="margin-top:30px; margin-bottom:30px;">
+                <ul id="breadcrumbs">
+                    <li class="etape1 temp1" id="#etape_reservation">
+                        <center><span class="Mycircle">1</span> Détails de la réservation</center>
+                    </li>
+                    <li class="etape2 temp2" id="#etape_billet">
+                        <center><span class="Mycircle">2</span> Renseignements sur le(s) billet(s)</center>
+                    </li>
+                    <li class="etape3 temp3" id="#etape_paiement" style="width: 369px !important;">
+                        <center><span class="Mycircle">3</span> Paiement</center>
+                    </li>
+                </ul>
+            </div>
+            <form action="{{ path('acheter_billet') }}" method="POST" id="form_reservation" novalidate>
+                <div class="payment-errors"></div>
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div id="reservation_info">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Sélectionner une date</label>
+                                    <div id="date_visite" data-date="12/03/2012"></div>
+                                    <input type="hidden" id="my_hidden_input" name="date_reservation" required>
+                                    <input type="hidden" id="date_reservation_formated" name="date_reservation_formated"
+                                           value="{{ (old_values.date_reservation_formated is defined) ? old_values.date_reservation_formated : '' }}" required>
+
+                                    <em class="error-field" id="error_date_reservation" style="margin: 2px 77px;">
+                                        {% if errors.date_de_naissance is defined %}{{ errors['date_de_naissance'] }}{% endif %}
+                                    </em>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-12">
+                                        <label for="nb_billet" class="col-form-label">Type de billet </label>
+                                        <select name="type_billet" class="form-control">
+                                            <option value="" selected hidden>--- choisissez le type de billet ---</option>
+                                            <option value="journee" id="journee_type"
+                                                    {% if(old_values.type_billet is defined) %}
+                                                        {{ (old_values.type_billet == 'journee') ? 'selected' : '' }}
+                                                    {% endif %} disabled>Journée</option>
+                                            <option value="demi-journee"
+                                                    {% if(old_values.type_billet is defined) %}
+                                                        {{ (old_values.type_billet == 'demi-journee') ? 'selected' : '' }}
+                                                    {% endif %}>Demi-journée</option>
+                                        </select>
+                                        <br>
+                                        <em class="error-field" id="type_billet">{% if errors.typeBillet is defined %}{{ errors['typeBillet'] }}{% endif %}</em>
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label for="nb_billet" class="col-form-label">Choisissez le nombre de
+                                            billets</label>
+                                        <input type="text" class="form-control" placeholder="nombre de billet"
+                                               id="nb_billet" name="nb_billet" value="{{ (old_values.nb_billet is defined) ? old_values.nb_billet : '' }}" required>
+                                        <br>
+                                        <em class="error-field" id="validation_billet"></em>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <center>
+                                        <div class="button-wrapper" style="margin-left: 52%">
+                                            <button type="submit" id="etapeSuivant" class="a-btn">
+                                                <span class="a-btn-text">Passez à l'étape suivante</span>
+                                                <span class="a-btn-slide-text">Renseignement sur le(s) billet(s)</span>
+                                            </button>
+                                        </div>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('date-picker/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('date-picker/locales/bootstrap-datepicker.fr.min.js') }}"></script>
+
+    <!-- script pour la partie reservation -->
+    <script type="text/javascript">
+        var now = new Date();
+        var disabled_dates_param = "{{ container.parameter('date_fermetures')|join(',') }}";
+        var disabled_dates = disabled_dates_param.split(',');
+
+        $('#date_visite').datepicker({
+            autoclose: true,
+            startDate: "today",
+            endDate: "+120d",
+            daysOfWeekDisabled: "2",
+            format: "dd-mm-yyyy",
+            todayHighlight: true,
+            language: 'fr',
+            orientation: "bottom",
+            beforeShowDay: function (date) {
+                var dt_ddmm = date.getDate() + '-' + (date.getMonth() + 1);
+                return (disabled_dates.indexOf(dt_ddmm) == -1);
+            }
+        }).on('changeDate', function (e) {
+            $('#etapeSuivant').attr("disabled", false);
+            $('#error_date_reservation').css('display','none').html('');
+            var fullDate = dateFr(e.date);
+            var selectedDate = new Date(e.date);
+            var sectedDateFormated = getFormattedDate(selectedDate);
+            $('#date_reservation_formated').val(sectedDateFormated);
+            $('#my_hidden_input').val(fullDate);
+
+            var current_hour = new Date();
+            var date_res = $('#date_reservation_formated').val();
+            var date_now = getFormattedDate(now);
+            if(date_now == date_res && current_hour.getHours() > 13){
+                $('#journee_type').attr('disabled',true);
+            }else{
+                $('#journee_type').attr('disabled',false);
+            }
+        });
+
+        $('form#form_reservation').submit(function(e){
+            e.preventDefault();
+            $("#loading_bar").fadeIn(1000).css("display", "block");
+            var nb_billet = $("#nb_billet").val();
+            var is_valid_billet = getErrorBillet(nb_billet);
+            if(is_valid_billet == true) $('form#form_reservation').get(0).submit();
+            else $('#validation_billet').html(is_valid_billet);
+        });
+
+        function getErrorBillet(nombre_billet){
+            if(nombre_billet != undefined && nombre_billet != '') {
+                if ($.isNumeric(nombre_billet) && nombre_billet < 100 && nombre_billet > 0) {
+                    return true;
+                }else{
+                    return 'Valeur non valide';
+                }
+            }else{
+                return 'Veuillez entrez le nombre de billet';
+            }
+        }
+
+        function getFormattedDate(date) {
+            var year = date.getFullYear();
+
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+
+            return year + '-' + month + '-' + day;
+        }
+        $('select[name="type_billet"]').click(function(){
+            $('#type_billet').html('');
+        });
+        $('#nb_billet').keyup(function(){
+            $('#validation_billet').html('');
+        });
+        //function pour faire la date en français
+        function dateFr(date) {
+            var mois = new Array("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "decembre");
+            // on recupere la date
+            var date = new Date(date);
+            // on construit le message
+            var message = date.getDate() + " ";   // numero du jour
+            message += mois[date.getMonth()] + " ";   // mois
+            message += date.getFullYear();
+            return message;
+        }
+    </script>
+
+{% endblock %}

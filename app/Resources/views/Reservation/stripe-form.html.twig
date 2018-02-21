@@ -1,0 +1,239 @@
+{% extends 'base.html.twig' %}
+
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('date-picker/css/bootstrap-datepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/stripe.css') }}">
+{% endblock %}
+{% block body %}
+    <div id="content">
+        <div class="container" style="background:#f5f5f5">
+            <div class="row" style="margin-top:30px; margin-bottom:30px;">
+                <ul id="breadcrumbs">
+                    <li class="etape1 temp1" id="#etape_reservation">
+                        <center><span class="Mycircle">1</span> Détails de la réservation</center>
+                    </li>
+                    <li class="etape2 temp2" id="#etape_billet">
+                        <center><span class="Mycircle">2</span> Renseignements sur le(s) billet(s)</center>
+                    </li>
+                    <li class="etape3 temp3" id="#etape_paiement" style="width: 369px !important;">
+                        <center><span class="Mycircle">3</span> Paiement</center>
+                    </li>
+                </ul>
+            </div>
+            <form action="{{ path('pay_reservation') }}" method="POST" id="form_stripe" novalidate>
+            <input type="hidden" name="stripeToken" value="{{ (old_values.stripeToken is defined) ? old_values.stripeToken : '' }}" />
+                <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-8">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <label>Détails de paiement</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <div class="display-td">
+                                        <img class="img-responsive pull-right"
+                                             src="http://i76.imgup.net/accepted_c22e0.png">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <label for="nomclient">Nom</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="nomclient" placeholder="Votre nom"
+                                    value="{{ (old_values.nomclient is defined) ? old_values.nomclient : '' }}"/>
+                                    <em id="nomclient" style="color: red; float: right; font-size: 13px;">{{ (errors.nom is defined) ? errors.nom : '' }}</em>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <label for="emailclient">Email</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="emailclient" placeholder="Votre email"
+                                    value="{{ (old_values.emailclient is defined) ? old_values.emailclient : '' }}"/>
+                                    <em id="emailclient" style="color: red; float: right; font-size: 13px;">{{ (errors.email is defined) ? errors.email : '' }}</em>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <label for="number">Numéro carte</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <input type="password" class="form-control" name="number" data-stripe="number"
+                                           placeholder="Votre numéro de carte"/>
+                                    <em id="card_error" style="color: red; float: right; font-size: 13px;"></em>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <label for="number">Mois d'expiration</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <select name="exp_month" class="form-control" data-stripe="exp-month">
+                                        <option value="01" {% if(old_values.exp_month is defined) %} {{ (old_values.exp_month == '01') ? 'selected' : '' }} {% endif %}>Janvier</option>
+                                        <option value="02" {% if(old_values.exp_month is defined) %} {{ (old_values.exp_month == '02') ? 'selected' : '' }} {% endif %}>Février</option>
+                                        <option value="03" {% if(old_values.exp_month is defined) %} {{ (old_values.exp_month == '03') ? 'selected' : '' }} {% endif %}>Mars</option>
+                                        <option value="04" {% if(old_values.exp_month is defined) %} {{ (old_values.exp_month == '04') ? 'selected' : '' }} {% endif %}>Avril</option>
+                                        <option value="05" {% if(old_values.exp_month is defined) %} {{ (old_values.exp_month == '05') ? 'selected' : '' }} {% endif %}>Mai</option>
+                                        <option value="06" {% if(old_values.exp_month is defined) %} {{ (old_values.exp_month == '06') ? 'selected' : '' }} {% endif %}>Juin</option>
+                                        <option value="07" {% if(old_values.exp_month is defined) %} {{ (old_values.exp_month == '07') ? 'selected' : '' }} {% endif %}>Juillet</option>
+                                        <option value="08" {% if(old_values.exp_month is defined) %} {{ (old_values.exp_month == '08') ? 'selected' : '' }} {% endif %}>Août</option>
+                                        <option value="09" {% if(old_values.exp_month is defined) %} {{ (old_values.exp_month == '09') ? 'selected' : '' }} {% endif %}>Septembre</option>
+                                        <option value="10" {% if(old_values.exp_month is defined) %} {{ (old_values.exp_month == '10') ? 'selected' : '' }} {% endif %}>Octobre</option>
+                                        <option value="11" {% if(old_values.exp_month is defined) %} {{ (old_values.exp_month == '11') ? 'selected' : '' }} {% endif %}>Novembre</option>
+                                        <option value="12" {% if(old_values.exp_month is defined) %} {{ (old_values.exp_month == '12') ? 'selected' : '' }} {% endif %}>Décembre</option>
+                                    </select>
+                                    <em id="exp_month" style="color: red; float: right; font-size: 13px;"></em>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <label for="number">Année d'expiration</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <select name="exp-year" class="form-control" data-stripe="exp-year">
+                                        {% for i in 0..10 %}
+                                            <option value="{{ 'now'|date('Y') + i }}">{{ 'now'|date('Y') + i }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <label for="number">Code de vérification</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="cvc" data-stripe="cvc" placeholder="Votre cvc"
+                                    value="{{ (old_values.cvc is defined) ? old_values.cvc : '' }}"/>
+                                    <em id="cvc" style="color: red; float: right; font-size: 13px;"></em>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="validate_all" class="button-wrapper" style="margin-left: 52%;">
+                            <button class="a-btn" style="margin-left: -13px;">
+                                <span class="a-btn-text">Validez votre reservation</span>
+                                <span class="a-btn-slide-text">Votre billet sera envoyé par mail</span>
+                                <span id="loading_pay"
+                                      style="display: none; margin: -34px 276px; position: absolute; z-index: 150;">
+                            <img class="img-circle img-responsive" width="20px"
+                                 src="{{ asset('images/loading_pr2.gif') }}">
+                        </span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-sm-2"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('date-picker/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('date-picker/locales/bootstrap-datepicker.fr.min.js') }}"></script>
+    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+    <!-- script pour la partie stripe form -->
+    <script type="text/javascript">
+        //get stripe info
+        Stripe.setPublishableKey('{{ container.parameter('stripe_public_key') }}');
+
+        var $_form = $('#form_stripe');
+
+        $('input[name="cvc"]').on('keydown', function (e) { $('#cvc').html(''); });
+        $_form.submit(function (e) {
+            e.preventDefault();
+            $_form.find('button').prop('disabled', true);
+            if ($('input[name="cvc"]').val() == '') {
+                $_form.find('button').prop('disabled', false);
+                if ($('input[name="cvc"]').val() == '') {
+                    $('#cvc').html('Champ obligatoire');
+                } else {
+                    $('#cvc').html('');
+                }
+            } else {
+                $("#loading_pay").fadeIn(1000).css("display", "block");
+                $('#cvc').html('');
+                Stripe.card.createToken($_form, function (status, response) {
+                    $("#loading_pay").fadeIn(1000).css("display", "block");
+                    if (response.error) {
+                        $("#loading_pay").fadeIn(1000).css("display", "none");
+                        $_form.find('button').prop('disabled', false);
+                        $('#card_error').html('');
+                        $('#exp_month').html('');
+                        if (response.error.type == "card_error" && response.error.param == "number") $('#card_error').html('Votre numéro de carte est invalide');
+                        if (response.error.type == "invalid_request_error") {
+                            $('#exp_month').html('');
+                            $('#card_error').html('Veuillez saisir votre numéro de carte');
+                        }
+                        if (response.error.type == "card_error" && response.error.param == "exp_month") $('#exp_month').html('Votre carte n\'est plus valide');
+                        if (response.error.type == "card_error" && response.error.param == "cvc") $('#cvc').html('Code cvc invalide');
+                        //$_form.find('.payment-errors').text(response.error.message);
+                    } else {
+                        $("#loading_pay").fadeIn(1000).css("display", "block");
+                        $_form.find('#card_error').html();
+                        $('#card_error').html('');
+                        $('#exp_month').html('');
+                        $('#cvc').html('');
+                        var _token = response.id;
+                        $('input[name="stripeToken"]').val(_token);
+                        $_form.get(0).submit();
+                    }
+                })
+            }
+        });
+
+        $('select[name=exp_month]').on('change',function(){ $('#exp_month').html(''); });
+        $('input[name=number]').keydown(function(){ $('#card_error').html(''); });
+        $('input[name=nomclient]').keydown(function(){ $('#nomclient').html(''); });
+        $('input[name=emailclient]').keydown(function(){ $('#emailclient').html(''); });
+
+        function validInput($string) {
+            if ($string != '' && $string != undefined && $string.trim()) {
+                if (isLetter($string) == true) {
+                    return true;
+                }
+                return 'Valeur non valide';
+            }
+            return 'Champ obligatoire';
+        }
+
+        function isLetter(str) {
+            if (str.match(/^([a-zA-Z_ \u00C0-\u00ff]+)$/i)) {
+                return true;
+            }
+            return false;
+        }
+
+        function isValidEmail(email_cli) {
+            if (email_cli != '' && email_cli != undefined) {
+                var pattern = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+                if (pattern.test(email_cli) == true) {
+                    return true;
+                }
+                return 'Format non valide';
+            }
+            return 'Champ obligatoire';
+        }
+    </script>
+
+{% endblock %}

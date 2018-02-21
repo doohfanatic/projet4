@@ -1,4 +1,0 @@
-reservation_place:
-    resource: "@ReservationBundle/Resources/config/routing/reservation.yml"
-    prefix:   /
-
