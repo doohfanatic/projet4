@@ -5,5 +5,5 @@ parameters:
 
 services:
     reservation_service:
-        class: ReservationBundle\Service\Reservation
+        class: AppBundle\Service\Reservation
         arguments: ['@service_container']
