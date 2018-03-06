@@ -54,6 +54,9 @@
                                                    placeholder="Date de naissance" autocomplete="off" readonly="">
                                         </p>
                                         <em class="error-field obligatoiretarif{{ i }}"></em>
+                                        <span class="alert-info 4ans{{ i }}" style="display: none">
+                                            L’entrée est gratuite pour les enfants de moins de 4 ans
+                                        </span>
                                     </div>
                                     <div class="col-sm-6">
                                         <input type="text" class="validate recherche form-control"
@@ -63,6 +66,8 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
+
+
                                         <input type="checkbox" name="tarif_reduit{{ i }}" id="{{ i }}">
                                         <span style="margin-left: 10px;">Je bénéficie d'un tarif réduit</span>
                                     </div>
@@ -148,6 +153,7 @@
                 $('#tarif').css('display', 'block');
                 $('.numbillet' + id).css('display', 'block').html('billet n° ' + id);
                 $('.tarif' + id).css('display', 'block').html(tarif);
+                $('.4ans' + id).css('display', 'none');
                 $('.montant' + id).css('display', 'block').html(montant + '<span style="float: right;">€');
             } else {
                 //calcul age
@@ -155,14 +161,34 @@
                 var dayDiff = Math.ceil(today - dob) / (1000 * 60 * 60 * 24 * 365);
                 var age = parseInt(dayDiff);
                 //get tarif
-                if (age <= 12) var montant = 8;
-                else if (age > 12 && age < 60) var montant = 16;
-                else var montant = 12;
+                if (age <= 4) {
+                    var montant = 0;
+                    $('.4ans' + id).css('display', 'block');
+
+                }
+                else if (age <= 12) {
+                    var montant = 8;
+                    $('.4ans' + id).css('display', 'none');
+
+                }
+                else if (age > 12 && age < 60) {
+                    var montant = 16;
+                    $('.4ans' + id).css('display', 'none');
+
+                }
+                else {
+                    var montant = 12;
+                    $('.4ans' + id).css('display', 'none').html(tarif);
+
+                }
                 $('#montant' + id).val(montant);
+
                 //get motif
-                if (age <= 12) var tarif = 'enfant';
+                if (age <= 4) var tarif = 'gratuit';
+                else if (age <= 12) var tarif = 'enfant';
                 else if (age > 12 && age < 60) var tarif = 'normal';
                 else var tarif = 'senior';
+
                 $('#motif' + id).val(tarif);
                 //append tarif value
                 $('#tarif').css('display', 'block');

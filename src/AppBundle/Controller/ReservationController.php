@@ -46,18 +46,21 @@ class ReservationController extends Controller
                 return $this->render(':Reservation:stripe-form.html.twig',['errors'=>$error_type,'old_values'=>$old_values]);
             }else{
                 $data_final['stripe_info'] = $data;
+                /*dump($data_final);
+                die();*/
+                if($data_final['montant_total'] !=0) {
+                    $customer = $stripe_manager->getStripeInfo('customers', [
+                        'source' => $data['stripeToken'],
+                        'description' => $data['nomclient'],
+                        'email' => $data['emailclient']
+                    ]);
 
-              /*  $customer = $stripe_manager->getStripeInfo('customers', [
-                    'source' => $data['stripeToken'],
-                    'description' => $data['nomclient'],
-                    'email' => $data['emailclient']
-                ]);
-
-                $stripe_manager->getStripeInfo('charges', [
-                    'amount' => $data_final['montant_total'] * 100,
-                    'currency' => 'eur',
-                    'customer' => $customer->id
-                ]);*/
+                    $stripe_manager->getStripeInfo('charges', [
+                        'amount' => $data_final['montant_total'] * 100,
+                        'currency' => 'eur',
+                        'customer' => $customer->id
+                    ]);
+                }
             }
 
             $this->addReservation($data_final);
