@@ -127,17 +127,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="validate_all" class="button-wrapper" style="margin-left: 52%;">
-                            <button class="a-btn" style="margin-left: -13px;">
-                                <span class="a-btn-text">Validez votre reservation</span>
-                                <span class="a-btn-slide-text">Votre billet sera envoyé par mail</span>
-                                <span id="loading_pay"
-                                      style="display: none; margin: -34px 276px; position: absolute; z-index: 150;">
-                            <img class="img-circle img-responsive" width="20px"
-                                 src="{{ asset('images/loading_pr2.gif') }}">
-                        </span>
-                            </button>
-                        </div>
+
+                        <button type="submit" class="a-btn" style="margin-left: -13px; float: right; cursor: pointer;">
+                            <span class="a-btn-text">Validez votre reservation</span>
+                            <span class="a-btn-slide-text">Votre billet sera envoyé par mail</span>
+                            <span id="loading_pay" style="display: none; margin: -34px 277px; position: absolute; z-index: 150;">
+                                <img class="img-circle img-responsive" width="20px"
+                                     src="{{ asset('images/loading_pr2.gif') }}">
+                            </span>
+                        </button>
                     </div>
                     <div class="col-sm-2"></div>
                 </div>
@@ -157,27 +155,29 @@
         //get stripe info
         Stripe.setPublishableKey('{{ container.parameter('stripe_public_key') }}');
 
-        var $_form = $('#form_stripe');
+        var $_form = $('form#form_stripe');
 
         $('input[name="cvc"]').on('keydown', function (e) { $('#cvc').html(''); });
         $_form.submit(function (e) {
             e.preventDefault();
-            $_form.find('button').prop('disabled', true);
+            $_form.find("button[type='submit']").prop("disabled", true);
+            $("#loading_pay").css("display", "block");
             if ($('input[name="cvc"]').val() == '') {
-                $_form.find('button').prop('disabled', false);
+                $("#loading_pay").css("display", "none");
+                $_form.find("button[type='submit']").prop('disabled', false);
                 if ($('input[name="cvc"]').val() == '') {
                     $('#cvc').html('Champ obligatoire');
                 } else {
                     $('#cvc').html('');
                 }
             } else {
-                $("#loading_pay").fadeIn(1000).css("display", "block");
+                $("#loading_pay").css("display", "block");
                 $('#cvc').html('');
                 Stripe.card.createToken($_form, function (status, response) {
-                    $("#loading_pay").fadeIn(1000).css("display", "block");
+                    $("#loading_pay").css("display", "block");
                     if (response.error) {
-                        $("#loading_pay").fadeIn(1000).css("display", "none");
-                        $_form.find('button').prop('disabled', false);
+                        $("#loading_pay").css("display", "none");
+                        $_form.find("button[type='submit']").prop('disabled', false);
                         $('#card_error').html('');
                         $('#exp_month').html('');
                         if (response.error.type == "card_error" && response.error.param == "number") $('#card_error').html('Votre numéro de carte est invalide');
@@ -189,7 +189,7 @@
                         if (response.error.type == "card_error" && response.error.param == "cvc") $('#cvc').html('Code cvc invalide');
                         //$_form.find('.payment-errors').text(response.error.message);
                     } else {
-                        $("#loading_pay").fadeIn(1000).css("display", "block");
+                        $("#loading_pay").css("display", "block");
                         $_form.find('#card_error').html();
                         $('#card_error').html('');
                         $('#exp_month').html('');

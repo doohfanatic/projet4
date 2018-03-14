@@ -141,7 +141,7 @@
 
         function getErrorBillet(nombre_billet){
             if(nombre_billet != undefined && nombre_billet != '') {
-                if ($.isNumeric(nombre_billet) && nombre_billet < 100 && nombre_billet > 0) {
+                if (Math.floor(nombre_billet) == nombre_billet && $.isNumeric(nombre_billet) && nombre_billet < 100 && nombre_billet > 0) {
                     return true;
                 }else{
                     return 'Valeur non valide';

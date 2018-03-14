@@ -125,3 +125,11 @@ button:focus {outline:0;}
 .datepicker table{
     width: 320px;
 }
+
+#validate_all .a-btn-text {
+    font-size: 17px;
+}
+
+#validate_all .a-btn-slide-text {
+    font-size: 9px;
+}
